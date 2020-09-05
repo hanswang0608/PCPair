@@ -39,7 +39,8 @@ app.use('/api/price', price);
 app.use('/', routes);
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost/hardware',
+const mongoURI = require('../config/keys');
+mongoose.connect(mongoURI,
     {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
