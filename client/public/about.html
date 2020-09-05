@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="public/pcpair.ico" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="../src/css/style.css">
+    <title>PCPair</title>
+</head>
+
+<body>
+    <div class="navbar navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <ul class="navbar-nav list-group-horizontal">
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/cpu">CPU</a>
+            </li>
+            <li class="nav-item active mr-4">
+                <a class="nav-link" href="/gpu">GPU</a>
+            </li>
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container canvas d-flex justify-content-center">
+        <div class="w-75">
+            <div class="p-5">
+                <h1 class="text-center">What is PCPair?</h1>
+                <p class="text-center description ">PCPair is a student project created to help people
+                    choose
+                    the best
+                    CPUs and GPUs to buy based on real benchmarks.
+                </p>
+            </div>
+            <div class="p-5">
+                <h1 class="text-center">How are the ranks decided?</h1>
+                <p class="text-center description ">PCPair uses 3DMark Timespy overall scores to decide the combined
+                    performance of any pair.
+                    Best by value ranks also take into account the score/price ratio to recommend best combinations for
+                    a
+                    price point.
+                </p>
+            </div>
+            <div class="p-5">
+                <h1 class="text-center">Where is the data from?</h1>
+                <p class="text-center description ">Performance data comes from 3DMark Timespy, a benchmark that should
+                    give
+                    accurate representations of DX12 gaming performance. Prices are taken from Canada Computers.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script type="module" src="src/about.js"></script>
+</body>
+
+</html>

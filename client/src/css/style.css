@@ -1,0 +1,145 @@
+html{
+    height: 100%;
+}
+body{
+    background: white;
+    height: 100%;
+}
+
+#form{
+    color: #333;
+}
+
+#result-area{
+    color: #333;
+    display: none;
+}
+
+.col-7{
+    padding: 0 !important;
+}
+
+#price{
+    border-radius: 5px 0 0 5px;
+    border-right-color: white;
+}
+
+.btn:focus{
+    box-shadow: none;
+}
+
+.btn1{
+    border-radius: 0;
+}
+
+.btn2{
+    border-radius: 0 5px 5px 0;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+    border-color: inherit !important;
+    box-shadow: none !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select:focus{
+    border-color: inherit !important;
+    box-shadow: none !important;
+}
+
+.canvas{
+    background: #f7f7f7;
+    padding-top: 100px;
+    padding-bottom: 100px;
+    height: auto;
+    min-height: 100vh;
+    box-shadow: 0 0 5px #aaa;
+}
+
+#search-collapse{
+    background-color: #f7f7f7;
+}
+
+.container{
+    /* max-width: 85%; */
+}
+
+#search-tip{
+    font-size: 0.9em;
+}
+
+.line-break{
+    width: 85%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.description{
+    font-size: 20px;
+    padding-top: 20px;
+}
+
+.table-row{
+    text-decoration: none;
+}
+
+.table-row-link{
+    color: inherit;
+}
+
+.table-row-link:hover{
+    text-decoration: none;
+    color: inherit
+}
+
+th {
+    cursor: pointer;
+    position: relative;
+}
+
+th:hover::after{
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: ' \f0dc';
+    display: inline-block;
+    position: absolute;
+    white-space: pre;
+}
+
+.navbar{
+    box-shadow: 0 0 5px gray;
+
+}
+
+#view-more{
+    display: none;
+}
+
+.product-img-frame{
+    background-color: white;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    margin-right: 10px;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="../public/pcpair.ico" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="../src/css/style.css">
+    <title>PCPair</title>
+</head>
+
+<body>
+    <div class="navbar navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <ul class="navbar-nav list-group-horizontal">
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/cpu">CPU</a>
+            </li>
+            <li class="nav-item active mr-4">
+                <a class="nav-link" href="/gpu">GPU</a>
+            </li>
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container canvas d-flex flex-column align-items-center">
+        <div class="row no-gutters justify-content-between w-75">
+            <div class="col-auto" id="cpu-info">
+                <a class="table-row-link">
+                    <h2 id="cpu-name"></h2>
+                </a>
+                <div class="row no-gutters">
+                    <div class="col-auto product-img-frame">
+                        <img src="" alt="" style="width: auto; height:auto; max-height: 90px">
+                    </div>
+                    <div class="col">
+                        <h5>Rank: <span></span></h5>
+                        <h5>Score: <span></span></h5>
+                        <h5>Price: <span></span></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto" id="gpu-info">
+                <a class="table-row-link">
+                    <h2 id="gpu-name"></h2>
+                </a>
+                <div class="row no-gutters">
+                    <div class="col-auto product-img-frame">
+                        <img src="" alt="" style="width: auto; height:auto; max-height: 90px">
+                    </div>
+                    <div class="col">
+                        <h5>Rank: <span></span></h5>
+                        <h5>Score: <span></span></h5>
+                        <h5>Price: <span></span></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="line-break">
+        <div class="w-75" id="pair-info">
+            <div class="row">
+                <div class="col">
+                    <h2>Overall</h2>
+                </div>
+            </div>
+            <div class="row justify-content-around mt-4">
+                <div class="pair-info-headers col">
+                    <h4>Rank: <span></span></h4>
+                </div>
+                <div class="pair-info-headers no-gutters col">
+                    <h4>Score: <span></span></h4>
+                </div>
+            </div>
+            <div class="row justify-content-around">
+                <div class="pair-info-headers col">
+                    <h4>Price: <span></span></h4>
+                </div>
+                <div class="pair-info-headers col">
+                    <h4>PriceToPerf: <span></span></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script type="module" src="../src/pair.js"></script>
+</body>
+
+</html>

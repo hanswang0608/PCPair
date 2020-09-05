@@ -1,0 +1,26 @@
+{
+  "name": "pcpair",
+  "version": "1.0.0",
+  "description": "A website that calculates the most optimal CPU and GPU combo for a given price.",
+  "main": "./server/server.js",
+  "scripts": {
+    "client-install": "npm install --prefix client",
+    "start": "node ./server/server.js",
+    "server": "nodemon ./server/server.js",
+    "client": "live-server ./client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "Hans Wang",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "concurrently": "^5.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.23",
+    "node-levenshtein": "^2.0.13",
+    "puppeteer": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="public/pcpair.ico" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="../src/css/style.css">
+    <script src="https://kit.fontawesome.com/823162c5d8.js" crossorigin="anonymous"></script>
+    <title>PCPair</title>
+</head>
+
+<body">
+    <div class="navbar navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <ul class="navbar-nav list-group-horizontal">
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/cpu">CPU</a>
+            </li>
+            <li class="nav-item active mr-4">
+                <a class="nav-link" href="/gpu">GPU</a>
+            </li>
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container canvas d-flex flex-column align-items-center">
+        <div class="w-75">
+            <div class="text-center">
+                <h1>PCPair</h1>
+            </div>
+            <div style="margin-top: 50px; margin-bottom: 100px">
+                <form>
+                    <!-- <h3>Search</h3> -->
+                    <div class="form-row justify-content-center">
+                        <div class="col-7 m-0">
+                            <input class="form-control" id="price" name="price" type="number"
+                                placeholder="Enter price range" value="500">
+                            <div class="position-absolute text-muted p-2" id="search-tip">
+                                <p class="m-0">*Enter your combined budget for <b>CPU and GPU</b> in Canadian Dollars.
+                                </p>
+                                <p class="m-0">*CPU and GPU together should be <b>50%</b> of your total PC budget.
+                                </p>
+                            </div>
+                            <div class="collapse" id="search-collapse">
+                                <div class="form-row m-0 p-2">
+                                    <label for="tolerance">Tolerance:</label>
+                                    <input class="form-control form-control-sm col-4 ml-2" id="tolerance"
+                                        name="tolerance" type="number" placeholder="% Upper limit" value="10">
+                                    <div class="form-check">
+                                        <label for="discontinued">Discontinued:</label>
+                                        <input type="checkbox" name="discontinued" id="discontinued">
+                                    </div>
+                                </div>
+                                <div class="form-row m-0 p-2 align-items-center">
+                                    <label for="cpuBrand">CPU Brand:</label>
+                                    <select class="form-control col-3 ml-2" name="cpuBrand" id="cpuBrand">
+                                        <option>All</option>
+                                        <option value="amd">AMD</option>
+                                        <option value="intel">Intel</option>
+                                    </select>
+                                    <label for="gpuBrand" class="ml-3">GPU Brand:</label>
+                                    <select class="form-control col-3 ml-2" name="gpuBrand" id="gpuBrand">
+                                        <option>All</option>
+                                        <option value="amd">AMD</option>
+                                        <option value="nvidia">Nvidia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Search Collapse">
+                            <button class="btn btn-dark btn1" type="button" id="search-collapse-button"
+                                data-toggle="collapse" data-target="#search-collapse" aria-expanded="false"
+                                aria-controls="search-collapse">
+                                <i class="fas fa-angle-down"></i>
+                            </button>
+                            <button class="btn btn-dark btn2"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    <span id="form-warning" style="display: none;"></span>
+                </form>
+            </div>
+            <div class="m-4 mt-5" id="result-area">
+                <!-- <div>
+                    <h2>Best by Performance</h2>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Rank</th>
+                                <th scope="col">CPU</th>
+                                <th scope="col">GPU</th>
+                                <th scope="col">Score</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Score/Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultPerf">
+                            
+                        </tbody>
+                    </table>
+                </div> -->
+                <div>
+                    <!-- <h2>Best by Value</h2> -->
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Rank</th>
+                                <th scope="col">CPU</th>
+                                <th scope="col">GPU</th>
+                                <th scope="col">Score</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Score/Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultPricePerf">
+
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <img src="public/ajax_loading.gif" alt="loading" id="ajax-loading"
+                            style="display: none; height: 10%; width: 10%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="view-more">View More</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+    <script type="module" src="src/index.js"></script>
+    </body>
+
+</html>

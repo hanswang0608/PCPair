@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="public/pcpair.ico" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="../src/css/style.css">
+    <script src="https://kit.fontawesome.com/823162c5d8.js" crossorigin="anonymous"></script>
+    <title>PCPair</title>
+</head>
+
+<body>
+    <div class="navbar navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <ul class="navbar-nav list-group-horizontal">
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/cpu">CPU</a>
+            </li>
+            <li class="nav-item active mr-4">
+                <a class="nav-link" href="/gpu">GPU</a>
+            </li>
+            <li class="nav-item active mr-4 ">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container canvas d-flex flex-column align-items-center">
+        <div class="w-75">
+            <h3>GPU Ranks</h3>
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">GPU</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Score/Price</th>
+                    </tr>
+                </thead>
+                <tbody id="result">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script type="module" src="src/gpus.js"></script>
+</body>
+
+</html>
