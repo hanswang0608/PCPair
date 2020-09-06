@@ -65,8 +65,8 @@ router.post('/', (req, res) => {
     if (req.header('Content-Type') !== 'application/json') {
         return res.status(406).json({success: false, message: 'Header content-type must be application/json'});
     }
-    const newGPU = new Pair(req.body);
-    newGPU.save()
+    const newPair = new Pair(req.body);
+    newPair.save()
         .then(data => res.json(data))
         .catch(err => res.status(409).json({success: false, message: 'Post failed'}));
 });

@@ -200,8 +200,11 @@ async function scrapeGPU(browser, product) {
         console.log(`${product.name} is not on CC`);
         return;
     }
-    await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
     console.log('clicked on matching gpu.');
+    await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
+    console.log('navigated to matching gpu');
+    await cc.waitForSelector(`#product-list div`);
+    console.log('waited for selector');
     await loadFullPage(cc);
     console.log('full page loaded.');
     await scrapeDiv(cc, product);
@@ -214,8 +217,12 @@ async function scrapeCPU(browser) {
     console.log('Scraping CPU');
     const cc = await browser.newPage();
     console.log('new page created.');
-    await cc.goto('https://www.canadacomputers.com/index.php?cPath=4');
+    await cc.goto('https://www.canadacomputers.com/index.php?cPath=4', {
+        timeout: 0
+    });
     console.log('page navigated to canada computers.');
+    await cc.waitForSelector(`#product-list div`);
+    console.log('waited for selector');
     await loadFullPage(cc);
     console.log('full page loaded.');
     await scrapeDiv(cc);
@@ -230,8 +237,6 @@ async function scrapeDiv(page, product) {
     let isCPU = arguments.length === 1;
     let variantsArr = [];
     let namesArr = [];
-    await page.waitForSelector(`#product-list div`);
-    console.log('waited for selector');
 
     do {
         div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
