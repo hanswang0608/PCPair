@@ -26,7 +26,6 @@ async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand
         for (pair of queryRes) {
             if (cpuBrand !== 'All') {
                 // const cpu = (await CPU.findOne({name: pair.cpu})).company.toLowerCase();
-                console.log(pair.cpu, pair.gpu, pair.cpuBrand, pair.gpuBrand);
                 if (pair.cpuBrand.toLowerCase() !== cpuBrand) continue;
             }
             if (gpuBrand !== 'All') {
@@ -124,7 +123,7 @@ async function queryPairsNew(priceTarget) {
     let counter = 0;
     let promises = [];
     const results = [];
-    console.log(pairs.length);
+    console.log(`Scraping ${pairs.length} pairs`);
     while (pairs.length !== 0) {
         const pair = pairs.pop();
         promises.push(scrapePairScore(pair.gpu, pair.cpu));
@@ -184,10 +183,10 @@ async function scrapeGPU(browser, product) {
 
     // Scraping Canada Computers
     const cc = await browser.newPage();
-    console.log('new page created.');
+    // console.log('new page created.');
     await cc.setViewport({width: 1920, height: 1920, deviceScaleFactor: 1});
     await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
-    console.log('page navigated to canada computers.');
+    // console.log('page navigated to canada computers.');
     const gpuList = await cc.$$eval('#collapse3 > div > ul > li', lis => lis.map(li => li.textContent.match(/^[^\(]*/)[0].trim()));
     let gpuMatch;
     for (let i = 0; i < gpuList.length; i++) {
@@ -200,15 +199,15 @@ async function scrapeGPU(browser, product) {
         console.log(`${product.name} is not on CC`);
         return;
     }
-    console.log('clicked on matching gpu.');
+    // console.log('clicked on matching gpu.');
     await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
-    console.log('navigated to matching gpu');
+    // console.log('navigated to matching gpu');
     await cc.waitForSelector(`#search-results`, {
         timeout: 0
     });
-    console.log('waited for selector');
+    // console.log('waited for selector');
     await loadFullPage(cc);
-    console.log('full page loaded.');
+    // console.log('full page loaded.');
     await scrapeDiv(cc, product);
     await cc.close();
 
@@ -218,24 +217,24 @@ async function scrapeGPU(browser, product) {
 async function scrapeCPU(browser) {
     console.log('Scraping CPU');
     const cc = await browser.newPage();
-    console.log('new page created.');
+    // console.log('new page created.');
     await cc.goto('https://www.canadacomputers.com/index.php?cPath=4', {
         timeout: 0
     });
-    console.log('page navigated to canada computers.');
+    // console.log('page navigated to canada computers.');
     await cc.waitForSelector(`#search-results`, {
         timeout: 0
     });
-    console.log('waited for selector');
+    // console.log('waited for selector');
     await loadFullPage(cc);
-    console.log('full page loaded.');
+    // console.log('full page loaded.');
     await scrapeDiv(cc);
     await cc.close();
     console.log('Finished Scraping CPU');
 }
 
 async function scrapeDiv(page, product) {
-    console.log('in scrapeDiv.');
+    // console.log('in scrapeDiv.');
     let counter = 2;
     let div;
     let isCPU = arguments.length === 1;
@@ -243,7 +242,7 @@ async function scrapeDiv(page, product) {
     let namesArr = [];
 
     do {
-        console.log('start of loop');
+        // console.log('start of loop');
         div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
         if (!div) break;
 
@@ -340,7 +339,7 @@ async function scrapeDiv(page, product) {
 
         newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href);
 
-        console.log('scraped data');
+        // console.log('scraped data');
 
         // if (isCPU) CPU.updateOne({name: newProduct.name}, newProduct, {upsert: true}).catch(err => console.log(err));
         if (isCPU) {
@@ -366,7 +365,7 @@ async function scrapeDiv(page, product) {
         }
         else variantsArr.push(newProduct);
         counter += 2;
-        console.log('end of loop');
+        // console.log('end of loop');
     } while (div);
 
     if (!isCPU) {

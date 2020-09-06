@@ -1,12 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const puppeteer = require('puppeteer');
-const path = require('path');
-
-// Import Mongoose Models
-const GPU = require('./models/GPU');
-const CPU = require('./models/CPU');
-const Pair = require('./models/Pair');
 
 const scraper = require('./scraper');
 const mongoURI = require('./config/keys');
@@ -48,3 +42,20 @@ mongoose.connect(mongoURI,
 // Setting a Port
 const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
+
+
+// scrape();
+
+// --- DISABLED --- 
+//Main scrape function that runs on heroku worker
+async function scrape() {
+    const browser = await puppeteer.launch({
+        ignoreDefaultArgs: ["--hide-scrollbars"],
+        args: ["--no-sandbox"]
+    });
+    if (process.env.NODE_ENV === 'production') {
+        await scraper.scrapeCPU(browser);
+        await scraper.scrapeAllGPUs(browser);
+        await scraper.queryPairsNew();
+    }
+}
