@@ -1,5 +1,5 @@
 const express = require('express');
-const scraper = require('../../server/scraper');
+const scraper = require('../../scraper');
 
 const router = express.Router();
 const {isNull} = require('util');

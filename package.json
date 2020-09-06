@@ -2,11 +2,11 @@
   "name": "pcpair",
   "version": "1.0.0",
   "description": "A website that calculates the most optimal CPU and GPU combo for a given price.",
-  "main": "./server/server.js",
+  "main": "./server.js",
   "scripts": {
     "client-install": "npm install --prefix client",
-    "start": "node ./server/server.js",
-    "server": "nodemon ./server/server.js",
+    "start": "node ./server.js",
+    "server": "nodemon ./server.js",
     "client": "live-server ./client",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },

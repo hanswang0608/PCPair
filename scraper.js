@@ -3,12 +3,30 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const axios = require('axios');
 
-const CPU = require('../models/CPU');
-const GPU = require('../models/GPU');
-const Pair = require('../models/Pair');
+const CPU = require('./models/CPU');
+const GPU = require('./models/GPU');
+const Pair = require('./models/Pair');
 
 const nodeLevenshtein = require('node-levenshtein');
 const {isNull, isUndefined} = require('util');
+
+// Main scrape function that runs on heroku worker
+scrape();
+
+async function scrape() {
+    const browser = await puppeteer.launch({
+        ignoreDefaultArgs: ["--hide-scrollbars"],
+        args: ['--no-sandbox']
+    });
+    if (process.env.NODE_ENV === 'production') {
+        await scrapeCPU(browser);
+        await scrapeAllGPUs(browser);
+        await queryPairsNew();
+    }
+    // await scrapeCPU(browser);
+    // await scrapeAllGPUs(browser);
+    // await queryPairsNew();
+}
 
 async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand, gpuBrand) {
     const results = [];
@@ -159,7 +177,7 @@ async function scrapeAllGPUs(browser) {
     const promises = [];
     const GPUs = await GPU.find();
     for (gpu of GPUs) {
-        promises.push(scraper.scrapeGPU(browser, gpu));
+        promises.push(scrapeGPU(browser, gpu));
     }
     // console.log(GPUs);
     await Promise.all(promises);
@@ -203,7 +221,7 @@ async function scrapeGPU(browser, product) {
     console.log('clicked on matching gpu.');
     await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
     console.log('navigated to matching gpu');
-    await cc.waitForSelector(`#product-list div`, {
+    await cc.waitForSelector(`#search-results`, {
         timeout: 0
     });
     console.log('waited for selector');
@@ -223,7 +241,7 @@ async function scrapeCPU(browser) {
         timeout: 0
     });
     console.log('page navigated to canada computers.');
-    await cc.waitForSelector(`#product-list div`, {
+    await cc.waitForSelector(`#search-results`, {
         timeout: 0
     });
     console.log('waited for selector');
