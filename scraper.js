@@ -16,7 +16,7 @@ scrape();
 async function scrape() {
     const browser = await puppeteer.launch({
         ignoreDefaultArgs: ["--hide-scrollbars"],
-        args: ['--no-sandbox']
+        args: ["--no-sandbox"]
     });
     if (process.env.NODE_ENV === 'production') {
         await scrapeCPU(browser);
