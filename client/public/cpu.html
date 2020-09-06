@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="../public/pcpair.ico" />
+    <link rel="icon" href="../public/assets/pcpair.ico" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="../src/css/style.css">
@@ -26,11 +26,23 @@
         </ul>
     </div>
 
-    <div class="container canvas d-flex flex-column align-items-center text-center">
-        <div>
-            <h2>CPU</h2>
-            <div id="cpuInfo"></div>
+    <div class="container canvas d-flex flex-column align-items-center">
+        <div id="cpu-info">
+            <a class="table-row-link">
+                <h2 id="cpu-name"></h2>
+            </a>
+            <div class="row no-gutters">
+                <div class="col-auto product-img-frame">
+                    <img src="" alt="" style="width: auto; height:auto; max-height: 90px">
+                </div>
+                <div class="col">
+                    <h5>Rank: <span></span></h5>
+                    <h5>Score: <span></span></h5>
+                    <h5>Price: $<span></span></h5>
+                </div>
+            </div>
         </div>
+        <hr class="line-break">
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script type="module" src="../src/cpu.js"></script>

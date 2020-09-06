@@ -51,7 +51,10 @@ app.listen(port, () => console.log(`Server started on port ${port}`));
 
 
 async function test() {
-    const browser = await puppeteer.launch({ignoreDefaultArgs: ["--hide-scrollbars"]});
+    const browser = await puppeteer.launch({
+        ignoreDefaultArgs: ["--hide-scrollbars"],
+        args: ['--no-sandbox']
+    });
 
     // await scraper.scrapeAllGPUs(browser);
     // await scraper.scrapeCPU(browser);

@@ -103,38 +103,38 @@ function scoreThresholdFactor(priceTarget) {
 }
 
 async function queryPairsNew(priceTarget) {
-    let CPUCollection = await CPU.find();
-    let GPUCollection = await GPU.find();
-    if (priceTarget) {
-        GPUCollection = GPUCollection.filter(gpu => gpu.price <= priceTarget * 1.1);
-        CPUCollection = CPUCollection.filter(cpu => cpu.price <= priceTarget * 1.1);
-    }
-    const pairs = [];
-    for (cpu of CPUCollection) {
-        for (gpu of GPUCollection) {
-            if (priceTarget) {
-                if ((cpu.price + gpu.price > priceTarget * 0.9) && (cpu.price + gpu.price < priceTarget * 1.1)) {
-                    pairs.push(new Object({cpu, gpu}));
-                }
-            } else {
-                pairs.push(new Object({cpu, gpu}));
-            }
-        }
-    }
-    let counter = 0;
-    let promises = [];
-    const results = [];
-    console.log(pairs.length);
-    while (pairs.length !== 0) {
-        const pair = pairs.pop();
-        promises.push(scrapePairScore(pair.gpu, pair.cpu));
-        counter++;
-        if (counter === 5 || pairs.length === 0) {
-            counter = 0;
-            results.push(...await Promise.all(promises));
-            promises = [];
-        }
-    }
+    // let CPUCollection = await CPU.find();
+    // let GPUCollection = await GPU.find();
+    // if (priceTarget) {
+    //     GPUCollection = GPUCollection.filter(gpu => gpu.price <= priceTarget * 1.1);
+    //     CPUCollection = CPUCollection.filter(cpu => cpu.price <= priceTarget * 1.1);
+    // }
+    // const pairs = [];
+    // for (cpu of CPUCollection) {
+    //     for (gpu of GPUCollection) {
+    //         if (priceTarget) {
+    //             if ((cpu.price + gpu.price > priceTarget * 0.9) && (cpu.price + gpu.price < priceTarget * 1.1)) {
+    //                 pairs.push(new Object({cpu, gpu}));
+    //             }
+    //         } else {
+    //             pairs.push(new Object({cpu, gpu}));
+    //         }
+    //     }
+    // }
+    // let counter = 0;
+    // let promises = [];
+    // const results = [];
+    // console.log(pairs.length);
+    // while (pairs.length !== 0) {
+    //     const pair = pairs.pop();
+    //     promises.push(scrapePairScore(pair.gpu, pair.cpu));
+    //     counter++;
+    //     if (counter === 5 || pairs.length === 0) {
+    //         counter = 0;
+    //         results.push(...await Promise.all(promises));
+    //         promises = [];
+    //     }
+    // }
 
     const pairArr = await Pair.find();
     pairArr.sort((a, b) => {
@@ -142,6 +142,12 @@ async function queryPairsNew(priceTarget) {
         else return 1;
     });
     for ([index, pair] of pairArr.entries()) {
+        if (pair.score === 0) {
+            for (zeroScorePair of pairArr.slice(index)) {
+                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1});
+            }
+            break;
+        }
         await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1});
     }
 

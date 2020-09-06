@@ -46,7 +46,7 @@ router.get('/', (req, res) => {
         Pair.findOne({cpu: req.query.cpu, gpu: req.query.gpu})
             .then(async data => {
                 if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
-                data._doc.total = await Pair.countDocuments();
+                data._doc.total = (await Pair.find().sort({rank: -1}).limit(1))[0].rank;
                 res.json(data);
             })
             .catch(err => res.status(500).json({success: false, message: 'Get request failed'}));

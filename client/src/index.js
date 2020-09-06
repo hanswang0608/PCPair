@@ -33,6 +33,7 @@ const resultPerfRef = document.getElementById('resultPerf');
 const resultPricePerfRef = document.getElementById('resultPricePerf');
 const viewMoreRef = document.getElementById('view-more');
 const searchCollapseButtonRef = document.getElementById('search-collapse-button');
+const searchCollapseRef = document.getElementById('search-collapse');
 const ajaxLoadingRef = document.getElementById('ajax-loading');
 
 priceRef.value = price;
@@ -58,19 +59,11 @@ if (price != null && tolerance != null) {
 
 searchCollapseButtonRef.addEventListener('click', () => {
     const searchTipRef = document.getElementById('search-tip');
-    // searchTipRef.style.display = 'none';
-    // console.log(searchTipRef.style.display === 'block' || searchTipRef.style.display === '');
-    if (searchTipRef.style.display === 'block' || searchTipRef.style.display === '') {
+    if (searchCollapseRef.className === 'collapse') {
         searchTipRef.style.display = 'none';
-    } else {
+    } else if (searchCollapseRef.className === 'collapse show') {
         searchTipRef.style.display = 'block';
     }
-    // searchTipRef.style.display = searchTipRef.style.display === 'block' || '' ? 'none' : 'block';
-    // console.log('clicked');
-    // if (searchCollapseButtonRef.ariaExpanded === 'true') console.log('true');
-    // console.log('clicked');
-    // searchCollapseButtonRef.innerHTML = window.dropDown ? '<i class="fas fa-angle-down"></i>' : '<i class="fas fa-angle-up"></i>';
-    // window.dropDown = !window.dropDown;
 });
 
 // Listen for view more button

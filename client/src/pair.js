@@ -11,9 +11,9 @@ async function getPairInfo(cpuname, gpuname) {
     const res = (await getPair({cpu: cpuname, gpu: gpuname})).data;
     const pairInfoHeadersRef = pairInfoRef.querySelectorAll('span');
     pairInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    pairInfoHeadersRef[1].innerHTML = res.score;
+    pairInfoHeadersRef[1].innerHTML = res.score || 'Not Benchmarked';
     pairInfoHeadersRef[2].innerHTML = res.price;
-    pairInfoHeadersRef[3].innerHTML = res.priceToPerf;
+    pairInfoHeadersRef[3].innerHTML = res.priceToPerf || 'Not Benchmarked';
 }
 
 async function getCPUInfo(cpuname) {
