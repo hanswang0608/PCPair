@@ -50,15 +50,20 @@ const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
 
 
-async function test() {
+async function init() {
     const browser = await puppeteer.launch({
         ignoreDefaultArgs: ["--hide-scrollbars"],
         args: ['--no-sandbox']
     });
+    if (process.env.NODE_ENV === 'production') {
+        await scraper.scrapeCPU(browser);
+        await scraper.scrapeAllGPUs(browser);
+        await scraper.queryPairsNew();
+    }
 
-    await scraper.scrapeCPU(browser);
-    await scraper.scrapeAllGPUs(browser);
-    await scraper.queryPairsNew();
+    // await scraper.scrapeCPU(browser);
+    // await scraper.scrapeAllGPUs(browser);
+    // await scraper.queryPairsNew();
 
     // console.log(await scraper.scrapePairScore(await GPU.findOne({name: 'Radeon RX 5700 XT'}), await CPU.findOne({name: 'Intel Core™ i9-10850K'})));
     // console.log('Intel Core i5 Processor I5-750'.match(/.+?(\d{4,5}[a-z]{0,2})/i));
@@ -92,4 +97,4 @@ async function test() {
     // console.log(res);
 }
 
-test();
+init();

@@ -121,15 +121,24 @@ select:focus{
 
 .table-row-link:hover{
     text-decoration: none;
-    color: inherit
+    color: royalblue
 }
 
-th {
+.no-deco-link{
+    color: inherit;
+}
+
+.no-deco-link:hover{
+    text-decoration: none;
+    color: inherit;
+}
+
+.sortable-header{
     cursor: pointer;
     position: relative;
 }
 
-th:hover::after{
+.sortable-header:hover::after{
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: ' \f0dc';

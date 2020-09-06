@@ -203,7 +203,9 @@ async function scrapeGPU(browser, product) {
     console.log('clicked on matching gpu.');
     await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
     console.log('navigated to matching gpu');
-    await cc.waitForSelector(`#product-list div`);
+    await cc.waitForSelector(`#product-list div`, {
+        timeout: 0
+    });
     console.log('waited for selector');
     await loadFullPage(cc);
     console.log('full page loaded.');
@@ -221,7 +223,9 @@ async function scrapeCPU(browser) {
         timeout: 0
     });
     console.log('page navigated to canada computers.');
-    await cc.waitForSelector(`#product-list div`);
+    await cc.waitForSelector(`#product-list div`, {
+        timeout: 0
+    });
     console.log('waited for selector');
     await loadFullPage(cc);
     console.log('full page loaded.');
@@ -541,7 +545,10 @@ async function loadFullPage(page) {
         moreToLoad = await page.$eval('#load_more', div => div.className) === 'pb-3 text-center text-uppercase text-muted';
         while (moreToLoad) {
             await page.click('#load_more > button');
-            await page.waitForSelector('#loading', {hidden: true});
+            await page.waitForSelector('#loading', {
+                hidden: true,
+                timeout: 0
+            });
             count = await page.$$eval('#product-list > div.col-xl-3.col-lg-4.col-6.mt-0_5.px-0_5.toggleBox.mb-1', divs => divs.length);
             moreToLoad = await page.$eval('#load_more', div => div.className) === 'pb-3 text-center text-uppercase text-muted';
         }

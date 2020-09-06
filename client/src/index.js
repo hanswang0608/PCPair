@@ -84,7 +84,21 @@ viewMoreRef.addEventListener('click', () => {
         const gpuName = el.querySelectorAll('span')[2].innerHTML;
         el.querySelectorAll('a').forEach(a => a.href = `/pair/?cpuname=${cpuName}&gpuname=${gpuName}`);
     });
+    document.querySelectorAll('.table-row-link').forEach(td => {
+        td.addEventListener('hover', () => {
+            td.parentElement.style.backgroundColor = 'black';
+            console.log('hovered');
+        });
+    });
+
     viewMoreRef.style.display = 'none';
+
+    document.querySelectorAll('.table-row-link').forEach(td => {
+        td.addEventListener('hover', () => {
+            td.parentElement.style.backgroundColor = 'black';
+            console.log('hovered');
+        });
+    });
 });
 
 
