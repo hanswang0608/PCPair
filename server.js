@@ -8,7 +8,8 @@ const GPU = require('./models/GPU');
 const CPU = require('./models/CPU');
 const Pair = require('./models/Pair');
 
-// const scraper = require('./scraper');
+const scraper = require('./scraper');
+const mongoURI = require('./config/keys');
 
 // Import routes
 const gpus = require('./routes/api/gpus');
@@ -39,7 +40,6 @@ app.use('/api/price', price);
 app.use('/', routes);
 
 // Connect to MongoDB
-const mongoURI = require('./config/keys');
 mongoose.connect(mongoURI,
     {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
     .then(() => console.log('MongoDB Connected'))

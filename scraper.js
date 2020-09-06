@@ -10,24 +10,6 @@ const Pair = require('./models/Pair');
 const nodeLevenshtein = require('node-levenshtein');
 const {isNull, isUndefined} = require('util');
 
-// Main scrape function that runs on heroku worker
-scrape();
-
-async function scrape() {
-    const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ["--hide-scrollbars"],
-        args: ["--no-sandbox"]
-    });
-    if (process.env.NODE_ENV === 'production') {
-        await scrapeCPU(browser);
-        await scrapeAllGPUs(browser);
-        await queryPairsNew();
-    }
-    // await scrapeCPU(browser);
-    // await scrapeAllGPUs(browser);
-    // await queryPairsNew();
-}
-
 async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand, gpuBrand) {
     const results = [];
     let query = {};
@@ -261,6 +243,7 @@ async function scrapeDiv(page, product) {
     let namesArr = [];
 
     do {
+        console.log('start of loop');
         div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
         if (!div) break;
 
@@ -357,7 +340,7 @@ async function scrapeDiv(page, product) {
 
         newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href);
 
-
+        console.log('scraped data');
 
         // if (isCPU) CPU.updateOne({name: newProduct.name}, newProduct, {upsert: true}).catch(err => console.log(err));
         if (isCPU) {
@@ -383,7 +366,7 @@ async function scrapeDiv(page, product) {
         }
         else variantsArr.push(newProduct);
         counter += 2;
-
+        console.log('end of loop');
     } while (div);
 
     if (!isCPU) {
