@@ -103,38 +103,38 @@ function scoreThresholdFactor(priceTarget) {
 }
 
 async function queryPairsNew(priceTarget) {
-    // let CPUCollection = await CPU.find();
-    // let GPUCollection = await GPU.find();
-    // if (priceTarget) {
-    //     GPUCollection = GPUCollection.filter(gpu => gpu.price <= priceTarget * 1.1);
-    //     CPUCollection = CPUCollection.filter(cpu => cpu.price <= priceTarget * 1.1);
-    // }
-    // const pairs = [];
-    // for (cpu of CPUCollection) {
-    //     for (gpu of GPUCollection) {
-    //         if (priceTarget) {
-    //             if ((cpu.price + gpu.price > priceTarget * 0.9) && (cpu.price + gpu.price < priceTarget * 1.1)) {
-    //                 pairs.push(new Object({cpu, gpu}));
-    //             }
-    //         } else {
-    //             pairs.push(new Object({cpu, gpu}));
-    //         }
-    //     }
-    // }
-    // let counter = 0;
-    // let promises = [];
-    // const results = [];
-    // console.log(pairs.length);
-    // while (pairs.length !== 0) {
-    //     const pair = pairs.pop();
-    //     promises.push(scrapePairScore(pair.gpu, pair.cpu));
-    //     counter++;
-    //     if (counter === 5 || pairs.length === 0) {
-    //         counter = 0;
-    //         results.push(...await Promise.all(promises));
-    //         promises = [];
-    //     }
-    // }
+    let CPUCollection = await CPU.find();
+    let GPUCollection = await GPU.find();
+    if (priceTarget) {
+        GPUCollection = GPUCollection.filter(gpu => gpu.price <= priceTarget * 1.1);
+        CPUCollection = CPUCollection.filter(cpu => cpu.price <= priceTarget * 1.1);
+    }
+    const pairs = [];
+    for (cpu of CPUCollection) {
+        for (gpu of GPUCollection) {
+            if (priceTarget) {
+                if ((cpu.price + gpu.price > priceTarget * 0.9) && (cpu.price + gpu.price < priceTarget * 1.1)) {
+                    pairs.push(new Object({cpu, gpu}));
+                }
+            } else {
+                pairs.push(new Object({cpu, gpu}));
+            }
+        }
+    }
+    let counter = 0;
+    let promises = [];
+    const results = [];
+    console.log(pairs.length);
+    while (pairs.length !== 0) {
+        const pair = pairs.pop();
+        promises.push(scrapePairScore(pair.gpu, pair.cpu));
+        counter++;
+        if (counter === 5 || pairs.length === 0) {
+            counter = 0;
+            results.push(...await Promise.all(promises));
+            promises = [];
+        }
+    }
 
     const pairArr = await Pair.find();
     pairArr.sort((a, b) => {
@@ -184,8 +184,10 @@ async function scrapeGPU(browser, product) {
 
     // Scraping Canada Computers
     const cc = await browser.newPage();
+    console.log('new page created.');
     await cc.setViewport({width: 1920, height: 1920, deviceScaleFactor: 1});
     await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
+    console.log('page navigated to canada computers.');
     const gpuList = await cc.$$eval('#collapse3 > div > ul > li', lis => lis.map(li => li.textContent.match(/^[^\(]*/)[0].trim()));
     let gpuMatch;
     for (let i = 0; i < gpuList.length; i++) {
@@ -199,7 +201,10 @@ async function scrapeGPU(browser, product) {
         return;
     }
     await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
-    await scrapeDiv(browser, product, cc.url());
+    console.log('clicked on matching gpu.');
+    await loadFullPage(cc);
+    console.log('full page loaded.');
+    await scrapeDiv(cc, product);
     await cc.close();
 
     console.log(`Finished scraping ${product.name}`);
@@ -207,30 +212,29 @@ async function scrapeGPU(browser, product) {
 
 async function scrapeCPU(browser) {
     console.log('Scraping CPU');
-    await scrapeDiv(browser);
+    const cc = await browser.newPage();
+    console.log('new page created.');
+    await cc.goto('https://www.canadacomputers.com/index.php?cPath=4');
+    console.log('page navigated to canada computers.');
+    await loadFullPage(cc);
+    console.log('full page loaded.');
+    await scrapeDiv(cc);
+    await cc.close();
     console.log('Finished Scraping CPU');
 }
 
-async function scrapeDiv(browser, product, gpuURL) {
-    //Try to see if the scraping can be done directly with api requests using axios instead of puppeteer
+async function scrapeDiv(page, product) {
+    console.log('in scrapeDiv.');
     let counter = 2;
     let div;
     let isCPU = arguments.length === 1;
     let variantsArr = [];
     let namesArr = [];
-    let timeSpyQuery;
-    const cc = await browser.newPage();
-    if (isCPU) {
-        await cc.goto('https://www.canadacomputers.com/index.php?cPath=4');
-        timeSpyQuery = await browser.newPage();
-    } else {
-        await cc.goto(gpuURL);
-    }
-    await loadFullPage(cc);
-    await cc.waitForSelector(`#product-list div`);
+    await page.waitForSelector(`#product-list div`);
+    console.log('waited for selector');
 
     do {
-        div = await cc.$(`#product-list > div:nth-child(${counter}) > div`);
+        div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
         if (!div) break;
 
         if (isCPU && !await div.$eval('small.d-block span', span => span.textContent.match(/(AMD)|(INT)/))) {
@@ -276,7 +280,7 @@ async function scrapeDiv(browser, product, gpuURL) {
 
         namesArr.push(newProduct.name);
 
-        //await cc.screenshot({ path: `C:/Users/HansW/OneDrive/Desktop/ccload.png`, type: 'png' });
+        //await page.screenshot({ path: `C:/Users/HansW/OneDrive/Desktop/ccload.png`, type: 'png' });
         newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
 
         if (isCPU) {
@@ -355,9 +359,6 @@ async function scrapeDiv(browser, product, gpuURL) {
 
     } while (div);
 
-    await cc.close();
-    if (isCPU) await timeSpyQuery.close();
-
     if (!isCPU) {
         const sumVariantsPrice = variantsArr.reduce((acc, cur) => {
             return acc + cur.price;
@@ -378,7 +379,7 @@ async function scrapeDiv(browser, product, gpuURL) {
             }));
         }
         const score = (await GPU.findOne({name: product.name})).score;
-        await GPU.updateOne({name: product.name}, {price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(), ccLink: gpuURL});
+        await GPU.updateOne({name: product.name}, {price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(), ccLink: page.url()});
 
         const GPUArr = await GPU.find();
         GPUArr.sort((a, b) => {
