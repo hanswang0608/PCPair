@@ -56,9 +56,9 @@ async function test() {
         args: ['--no-sandbox']
     });
 
-    // await scraper.scrapeAllGPUs(browser);
-    // await scraper.scrapeCPU(browser);
-    // await scraper.queryPairsNew();
+    await scraper.scrapeCPU(browser);
+    await scraper.scrapeAllGPUs(browser);
+    await scraper.queryPairsNew();
 
     // console.log(await scraper.scrapePairScore(await GPU.findOne({name: 'Radeon RX 5700 XT'}), await CPU.findOne({name: 'Intel Core™ i9-10850K'})));
     // console.log('Intel Core i5 Processor I5-750'.match(/.+?(\d{4,5}[a-z]{0,2})/i));
