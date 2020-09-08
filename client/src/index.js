@@ -66,18 +66,19 @@ searchCollapseButtonRef.addEventListener('click', () => {
     }
 });
 
+console.log(document.body.style.fontFamily);
 // Listen for view more button
 viewMoreRef.addEventListener('click', () => {
     const resultPricePerf = res.data[1];
     resultPricePerfRef.innerHTML = (resultPricePerf.map((el, index) =>
-        `<tr class="table-row">
-                <th><span>${index + 1}</span></th>
-                <td><a class="table-row-link"><span>${el.cpu}</span></a></td>
-                <td><a class="table-row-link"><span>${el.gpu}</span></a></td>
-                <td><a class="table-row-link"><span>${el.score}</span></a></td>
-                <td><a class="table-row-link">$<span>${el.price}</span></a></td>
-                <td><a class="table-row-link"><span>${el.priceToPerf}</span></a></td>
-            </tr>`
+        `<tr class="table-row pcpair-color-hover">
+            <th><span>${index + 1}</span></th>
+            <td><a class="table-row-link no-deco-link"><span>${el.cpu}</span></a></td>
+            <td><a class="table-row-link no-deco-link"><span>${el.gpu}</span></a></td>
+            <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
+            <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
+            <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>
+        </tr>`
     )).join('');
     document.querySelectorAll('.table-row').forEach(el => {
         const cpuName = el.querySelectorAll('span')[1].innerHTML;
@@ -111,13 +112,13 @@ async function priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand) {
     const resultPerf = res.data[0].slice(0, 3);
     const resultPricePerf = res.data[1].slice(0, 5);
     resultPricePerfRef.innerHTML = (resultPricePerf.map((el, index) =>
-        `<tr class="table-row">
+        `<tr class="table-row pcpair-color-hover">
                 <th><span>${index + 1}</span></th>
-                <td><a class="table-row-link"><span>${el.cpu}</span></a></td>
-                <td><a class="table-row-link"><span>${el.gpu}</span></a></td>
-                <td><a class="table-row-link"><span>${el.score}</span></a></td>
-                <td><a class="table-row-link">$<span>${el.price}</span></a></td>
-                <td><a class="table-row-link"><span>${el.priceToPerf}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.cpu}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.gpu}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
+                <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>
             </tr>`
     )).join('');
     viewMoreRef.style.display = 'block';

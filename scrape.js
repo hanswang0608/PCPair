@@ -11,10 +11,12 @@ mongoose.connect('mongodb+srv://hans:010608Wang@pcpair.9ty34.azure.mongodb.net/P
 
 var scrp = schedule.scheduleJob('0 0 * * *', scrape);
 
-// scrape();
+console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 
+// scrape();
 // Scrape function that updates to MongoDB Atlas
 async function scrape() {
+    console.log("Hey friends, active here...");
     const browser = await puppeteer.launch({
         ignoreDefaultArgs: ["--hide-scrollbars"]
     });
@@ -22,4 +24,5 @@ async function scrape() {
     await scraper.scrapeAllGPUs(browser);
     await scraper.queryPairsNew();
     await browser.close();
+    console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 }

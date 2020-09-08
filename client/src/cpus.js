@@ -9,12 +9,12 @@ getCPUs().then(res => {
             else return 1;
         })
         .map((el, index) =>
-            `<tr class="table-row">
+            `<tr class="table-row pcpair-color-hover">
                 <th><span>${index + 1}</span></th>
-                <td><a class="table-row-link"><span>${el.name}</span></a></td>
-                <td><a class="table-row-link"><span>${el.score}</span></a></td>
-                <td><a class="table-row-link">$<span>${el.price}</span></a></td>
-                <td><a class="table-row-link"><span>${el.priceToPerf}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.name}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
+                <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>
             </tr>
             `
         )).join('');

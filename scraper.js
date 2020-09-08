@@ -140,14 +140,15 @@ async function queryPairsNew(priceTarget) {
         if (a.score >= b.score) return -1;
         else return 1;
     });
+    const highestScore = pairArr[0].score;
     for ([index, pair] of pairArr.entries()) {
         if (pair.score === 0) {
             for (zeroScorePair of pairArr.slice(index)) {
-                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1});
+                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1, percentage: 0});
             }
             break;
         }
-        await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1});
+        await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1, percentage: (pair.score / highestScore * 100).toFixed(2)});
     }
 
     console.log('Done All');
@@ -158,10 +159,10 @@ async function scrapeAllGPUs(browser) {
     const promises = [];
     const GPUs = await GPU.find();
     for (gpu of GPUs) {
-        promises.push(scrapeGPU(browser, gpu));
+        await scrapeGPU(browser, gpu);
     }
     // console.log(GPUs);
-    await Promise.all(promises);
+    // await Promise.all(promises);
     console.log('All GPUs Finished Scraping');
 }
 
@@ -171,8 +172,13 @@ async function scrapeGPU(browser, product) {
         console.log(`${product.name} does not exist`);
         return;
     }
-
-    await GPU.updateOne({name: product.name}, {score: await scrapeGPUScore(product.name)});
+    const score = await scrapeGPUScore(product.name);
+    await GPU.updateOne({name: product.name}, {score});
+    let scoreHistory = product.scoreHistory;
+    if (scoreHistory.length === 0 || (score !== scoreHistory[scoreHistory.length - 1].score)) {
+        scoreHistory.push(new Object({score, date: Date.now()}));
+    }
+    await GPU.updateOne({name: product.name}, {scoreHistory});
 
     // List of special names
     let tempName = product.name;
@@ -201,11 +207,10 @@ async function scrapeGPU(browser, product) {
     }
     // console.log('clicked on matching gpu.');
     await cc.click(`#collapse3 > div > ul > li:nth-child(${gpuMatch + 1}) input`);
+    // await cc.waitForSelector(`#product-list`, {
+    //     timeout: 300000
+    // });
     // console.log('navigated to matching gpu');
-    await cc.waitForSelector(`#search-results`, {
-        timeout: 0
-    });
-    // console.log('waited for selector');
     await loadFullPage(cc);
     // console.log('full page loaded.');
     await scrapeDiv(cc, product);
@@ -219,13 +224,9 @@ async function scrapeCPU(browser) {
     const cc = await browser.newPage();
     // console.log('new page created.');
     await cc.goto('https://www.canadacomputers.com/index.php?cPath=4', {
-        timeout: 0
+        timeout: 300000
     });
     // console.log('page navigated to canada computers.');
-    await cc.waitForSelector(`#search-results`, {
-        timeout: 0
-    });
-    // console.log('waited for selector');
     await loadFullPage(cc);
     // console.log('full page loaded.');
     await scrapeDiv(cc);
@@ -241,20 +242,30 @@ async function scrapeDiv(page, product) {
     let variantsArr = [];
     let namesArr = [];
 
-    do {
+    // Wait for page to load
+    await page.waitForSelector(`#product-list > div:nth-child(2) > div span.text-dark.d-block.productTemplate_title a`, {
+        timeout: 300000
+    });
+    await page.waitForSelector(`#product-list > div:nth-child(2) > div span.d-block.mb-0.pq-hdr-product_price.line-height strong`, {
+        timeout: 300000
+    });
+    await page.waitForSelector(`#product-list > div:nth-child(2) > div div div img`, {
+        timeout: 300000
+    });
+    await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(1) small`, {
+        timeout: 300000
+    });
+    await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(2) small`, {
+        timeout: 300000
+    });
+
+    loopDivs: do {
         // console.log('start of loop');
         div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
         if (!div) break;
 
         if (isCPU && !await div.$eval('small.d-block span', span => span.textContent.match(/(AMD)|(INT)/))) {
             counter += 2;
-            continue;
-        }
-
-        // Disregard Athlon & Pentium CPUs
-        if (isCPU && await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent.match(/(Athlon)|(Pentium)/))) {
-            counter += 2;
-            //console.log('skipped');
             continue;
         }
 
@@ -267,9 +278,18 @@ async function scrapeDiv(page, product) {
             newProduct.name = newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)[0];
         }
 
-        if (newProduct.name.match(/threadripper/i)) {
-            counter += 2;
-            continue;
+        const blacklist = [
+            'athlon',
+            'pentium',
+            '10700KA'
+        ];
+
+        for (item of blacklist) {
+            if (newProduct.name.match(new RegExp(item, 'i'))) {
+                console.log(`${newProduct.name} was skipped`);
+                counter += 2;
+                continue loopDivs;
+            }
         }
 
         newProduct.name = newProduct.name.replace(/intel/i, 'Intel');
@@ -295,9 +315,11 @@ async function scrapeDiv(page, product) {
         if (isCPU) {
             try {
                 newProduct.priceHistory = [...(await CPU.findOne({name: newProduct.name})).priceHistory];
+                newProduct.scoreHistory = [...(await CPU.findOne({name: newProduct.name})).scoreHistory];
             } catch (e) {
                 console.log(`${newProduct.name} is new`);
                 newProduct.priceHistory = [];
+                newProduct.scoreHistory = [];
             }
             if (newProduct.priceHistory.length === 0 || (newProduct.price !== newProduct.priceHistory[newProduct.priceHistory.length - 1].price)) {
                 // console.log(newProduct.name, );
@@ -308,7 +330,9 @@ async function scrapeDiv(page, product) {
             }
 
             newProduct.score = await scrapeCPUScore(newProduct.name);
-            // console.log(cpuId);
+            if (newProduct.scoreHistory.length === 0 || (newProduct.score !== newProduct.scoreHistory[newProduct.scoreHistory.length - 1].score)) {
+                newProduct.scoreHistory.push(new Object({score: newProduct.score, date: Date.now()}));
+            }
             newProduct.priceToPerf = (newProduct.score / newProduct.price).toFixed(4);
         }
 
@@ -354,6 +378,7 @@ async function scrapeDiv(page, product) {
                 doc.priceHistory = newProduct.priceHistory;
                 doc.lastModified = newProduct.lastModified;
                 doc.score = newProduct.score;
+                doc.scoreHistory = newProduct.scoreHistory;
                 doc.priceToPerf = newProduct.priceToPerf;
                 doc.ccLink = newProduct.ccLink;
                 doc.save();
@@ -388,18 +413,23 @@ async function scrapeDiv(page, product) {
             }));
         }
         const score = (await GPU.findOne({name: product.name})).score;
-        await GPU.updateOne({name: product.name}, {price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(), ccLink: page.url()});
+        await GPU.updateOne({name: product.name},
+            {
+                price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(),
+                ccLink: page.url(), online: variantsArr.some(variant => variant.online), instore: variantsArr.some(variant => variant.instore)
+            });
 
         const GPUArr = await GPU.find();
         GPUArr.sort((a, b) => {
             if (a.score >= b.score) return -1;
             else return 1;
         });
+        const highestScore = GPUArr[0].score;
         for ([index, gpu] of GPUArr.entries()) {
             if (!gpu.lastModified || (new Date() - gpu.lastModified) / 1000 > 600) {
-                await GPU.updateOne({name: gpu.name}, {onCC: false, rank: index + 1});
+                await GPU.updateOne({name: gpu.name}, {onCC: false, rank: index + 1, percentage: (gpu.score / highestScore * 100).toFixed(2)});
             } else {
-                await GPU.updateOne({name: gpu.name}, {onCC: true, rank: index + 1});
+                await GPU.updateOne({name: gpu.name}, {onCC: true, rank: index + 1, percentage: (gpu.score / highestScore * 100).toFixed(2)});
             }
         }
 
@@ -411,11 +441,12 @@ async function scrapeDiv(page, product) {
             if (a.score >= b.score) return -1;
             else return 1;
         });
+        const highestScore = CPUArr[0].score;
         for ([index, cpu] of CPUArr.entries()) {
             if ((new Date() - cpu.lastModified) / 1000 > 600) {
-                await CPU.updateOne({name: cpu.name}, {onCC: false, rank: index + 1});
+                await CPU.updateOne({name: cpu.name}, {onCC: false, rank: index + 1, percentage: (cpu.score / highestScore * 100).toFixed(2)});
             } else {
-                await CPU.updateOne({name: cpu.name}, {onCC: true, rank: index + 1});
+                await CPU.updateOne({name: cpu.name}, {onCC: true, rank: index + 1, percentage: (cpu.score / highestScore * 100).toFixed(2)});
             }
         }
     }
@@ -450,7 +481,7 @@ async function scrapeId(name, isCPU) {
     }
     return res[match].id;
 }
-//
+
 async function scrapePairScore(gpu, cpu) {
     const gpuName = gpu.name;
     const cpuName = cpu.name;
@@ -473,6 +504,9 @@ async function scrapePairScore(gpu, cpu) {
             newPair.scoreHistory.push(new Object({score: median, date: Date.now()}));
         }
         newPair.price = (gpu.price + cpu.price).toFixed(2);
+        if (newPair.priceHistory.length === 0 || (newPair.price !== newPair.priceHistory[newPair.priceHistory.length - 1].price)) {
+            newPair.priceHistory.push(new Object({price: newPair.price, date: Date.now()}));
+        }
         newPair.priceToPerf = (median / (gpu.price + cpu.price)).toFixed(4);
         newPair.lastModified = Date.now();
         (gpu.onCC && cpu.onCC) ? newPair.onCC = true : newPair.onCC = false;
@@ -485,6 +519,7 @@ async function scrapePairScore(gpu, cpu) {
             score: median,
             scoreHistory: [{score: median, date: Date.now()}],
             price: (gpu.price + cpu.price).toFixed(2),
+            priceHistory: [{price: (gpu.price + cpu.price).toFixed(2), date: Date.now()}],
             priceToPerf: (median / (gpu.price + cpu.price)).toFixed(4),
             lastModified: Date.now(),
             onCC: (gpu.onCC && cpu.onCC) ? true : false
@@ -547,7 +582,7 @@ async function loadFullPage(page) {
             await page.click('#load_more > button');
             await page.waitForSelector('#loading', {
                 hidden: true,
-                timeout: 0
+                timeout: 300000
             });
             count = await page.$$eval('#product-list > div.col-xl-3.col-lg-4.col-6.mt-0_5.px-0_5.toggleBox.mb-1', divs => divs.length);
             moreToLoad = await page.$eval('#load_more', div => div.className) === 'pb-3 text-center text-uppercase text-muted';

@@ -4,6 +4,7 @@ html{
 body{
     background: white;
     height: 100%;
+    font-family:  sans-serif;
 }
 
 #form{
@@ -119,11 +120,6 @@ select:focus{
     color: inherit;
 }
 
-.table-row-link:hover{
-    text-decoration: none;
-    color: royalblue
-}
-
 .no-deco-link{
     color: inherit;
 }
@@ -131,6 +127,20 @@ select:focus{
 .no-deco-link:hover{
     text-decoration: none;
     color: inherit;
+}
+
+.pcpair-color{
+    color: #07689f
+}
+
+.pcpair-color-hover:hover{
+    text-decoration: none;
+    color: #07689f
+}
+
+.accent-link-hover:hover{
+    text-decoration: none;
+    color: #40a8c4
 }
 
 .sortable-header{
@@ -161,4 +171,15 @@ select:focus{
     padding-left: 10px !important;
     padding-right: 10px !important;
     margin-right: 10px;
+}
+
+.buy-info-cells{
+    text-align: center;
+    vertical-align: middle !important;
+    font-size: 1.1em;
+}
+
+.chart-container{
+    background-color: white;
+    box-shadow: 0 0 1px #aaa;
 }

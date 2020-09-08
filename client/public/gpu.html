@@ -7,12 +7,15 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="../src/css/style.css">
+    <script src="https://kit.fontawesome.com/823162c5d8.js" crossorigin="anonymous"></script>
     <title>PCPair</title>
+    <!--Google Charts-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body>
     <div class="navbar navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <a class="navbar-brand ml-4" href="/"><b><span class="pcpair-color pcpair-color-hover">PC</span>Pair</b></a>
         <ul class="navbar-nav list-group-horizontal">
             <li class="nav-item active mr-4 ">
                 <a class="nav-link" href="/cpu">CPU</a>
@@ -26,10 +29,59 @@
         </ul>
     </div>
 
-    <div class="container canvas d-flex flex-column align-items-center text-center">
-        <div>
-            <h2>GPU</h2>
-            <div id="gpuInfo"></div>
+    <div class="container canvas d-flex flex-column align-items-center">
+        <div class="w-75">
+            <div id="gpu-info">
+                <div class="mb-4 row no-gutters justify-content-between align-items-end">
+                    <div id="gpu-name" class="h1 col-auto"></div>
+                    <div class="h2 col text-right">Rank: <span class="gpu-info-header"></span></div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-auto product-img-frame">
+                        <img src="" alt="" style="width: auto; height:150px">
+                    </div>
+                    <div class="col d-flex flex-column justify-content-between">
+                        <span class="h4">Score: <span class="gpu-info-header"></span></span>
+                        <span class="h4">Price: $<span class="gpu-info-header"></span></span>
+                        <span class="h4">Score/Price: <span class="gpu-info-header"></span></span>
+                    </div>
+                </div>
+            </div>
+            <hr class="line-break">
+            <div id="buy-info">
+                <!-- <h2>Buy Now:</h2> -->
+                <table class="table">
+                    <thead class="thead-light text-center">
+                        <tr>
+                            <th scope="col">Retailer</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">In-Store</th>
+                            <th scope="col">Online</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="buy-info-cells"><a><img src="https://www.canadacomputers.com/images/cc-og.jpg"
+                                        alt="Canada Computers" style="width: auto; height: auto; max-height: 50px"></a>
+                            </td>
+                            <td class="buy-info-cells"></td>
+                            <td class="buy-info-cells"></td>
+                            <td class="buy-info-cells"></td>
+                            <td class="buy-info-cells"><a class="no-deco-link pcpair-color-hover"><i
+                                        class="fas fa-shopping-cart fa-lg"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="chart-container text-center py-2 mt-5">
+                <span class="h6">Price History</span>
+                <div id="price-history-chart"></div>
+            </div>
+            <div class="chart-container text-center py-2 mt-5">
+                <span class="h6">Score History</span>
+                <div id="score-history-chart"></div>
+            </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>

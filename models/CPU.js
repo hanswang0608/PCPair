@@ -53,11 +53,17 @@ const CPUSchema = new Schema({
     score: {
         type: Number
     },
+    scoreHistory: [{
+        score: Number, date: Date
+    }],
     rank: {
         type: Number
     },
     ccLink: {
         type: String
+    },
+    percentage: {
+        type: Number
     }
 }, {collation: {locale: 'en', strength: 2}});
 

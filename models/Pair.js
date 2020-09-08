@@ -22,6 +22,9 @@ const PairSchema = new Schema({
     price: {
         type: Number
     },
+    priceHistory: [{
+        price: Number, date: Date
+    }],
     priceToPerf: {
         type: Number
     },
@@ -36,6 +39,9 @@ const PairSchema = new Schema({
     },
     gpuBrand: {
         type: String
+    },
+    percentage: {
+        type: Number
     }
 }, {collation: {locale: 'en', strength: 2}});
 

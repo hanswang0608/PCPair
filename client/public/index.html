@@ -13,7 +13,7 @@
 
 <body">
     <div class="navbar navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <a class="navbar-brand ml-4" href="/"><b><span class="pcpair-color pcpair-color-hover">PC</span>Pair</b></a>
         <ul class="navbar-nav list-group-horizontal">
             <li class="nav-item active mr-4 ">
                 <a class="nav-link" href="/cpu">CPU</a>
@@ -31,20 +31,22 @@
         <div class="w-75">
             <div class="text-center">
                 <a href="/" class="no-deco-link">
-                    <h1>PCPair</h1>
+                    <h1><span class="pcpair-color pcpair-color-hover">PC</span>Pair</h1>
                 </a>
             </div>
             <div style="margin-top: 50px; margin-bottom: 100px">
                 <form>
-                    <!-- <h3>Search</h3> -->
                     <div class="form-row justify-content-center">
                         <div class="col-7 m-0">
                             <input class="form-control" id="price" name="price" type="number"
                                 placeholder="Enter price range">
                             <div class="position-absolute text-muted p-2" id="search-tip">
-                                <p class="m-0">*Enter your combined budget for <b>CPU and GPU</b> in Canadian Dollars.
+                                <p class="m-0">*Enter your combined budget for <b class="pcpair-color">CPU and GPU</b>
+                                    in
+                                    Canadian Dollars.
                                 </p>
-                                <p class="m-0">*CPU and GPU together should be <b>50%</b> of your total PC budget.
+                                <p class="m-0">*CPU and GPU together should be <b class="pcpair-color">50%</b> of your
+                                    total PC budget.
                                 </p>
                             </div>
                             <div class="collapse" id="search-collapse">
@@ -53,7 +55,7 @@
                                     <input class="form-control form-control-sm col-4 ml-2" id="tolerance"
                                         name="tolerance" type="number" placeholder="% Upper limit" value="10">
                                     <div class="form-check">
-                                        <label for="discontinued">Discontinued:</label>
+                                        <label for="discontinued">Unlisted:</label>
                                         <input type="checkbox" name="discontinued" id="discontinued">
                                     </div>
                                 </div>
@@ -74,12 +76,11 @@
                             </div>
                         </div>
                         <div class="btn-group" role="group" aria-label="Search Collapse">
-                            <button class="btn btn-dark btn1 collapsed" type="button" id="search-collapse-button"
-                                data-toggle="collapse" data-target="#search-collapse" aria-expanded="false"
-                                aria-controls="search-collapse">
-                                <!-- <i class="fas fa-angle-down"></i> -->
+                            <button class="btn btn-dark btn1 collapsed pcpair-color-hover" type="button"
+                                id="search-collapse-button" data-toggle="collapse" data-target="#search-collapse"
+                                aria-expanded="false" aria-controls="search-collapse">
                             </button>
-                            <button class="btn btn-dark btn2"><i class="fas fa-search"></i></button>
+                            <button class="btn btn-dark btn2 pcpair-color-hover"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                     <span id="form-warning" style="display: none;"></span>
@@ -128,7 +129,8 @@
                 </div>
             </div>
         </div>
-        <button id="view-more">View More</button>
+        <button class="btn btn-light pcpair-color-hover" id="view-more"><i
+                class="fas fa-chevron-circle-down fa-lg"></i></button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>

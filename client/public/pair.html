@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="../src/css/style.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>PCPair</title>
 </head>
 
 <body>
     <div class="navbar navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand ml-4" href="/">PCPair</a>
+        <a class="navbar-brand ml-4" href="/"><b><span class="pcpair-color pcpair-color-hover">PC</span>Pair</b></a>
         <ul class="navbar-nav list-group-horizontal">
             <li class="nav-item active mr-4 ">
                 <a class="nav-link" href="/cpu">CPU</a>
@@ -29,14 +30,14 @@
     <div class="container canvas d-flex flex-column align-items-center">
         <div class="row no-gutters justify-content-between w-75">
             <div class="col-auto" id="cpu-info">
-                <a class="table-row-link">
+                <a class="pcpair-color accent-link-hover">
                     <h2 id="cpu-name"></h2>
                 </a>
                 <div class="row no-gutters">
                     <div class="col-auto product-img-frame">
                         <img src="" alt="" style="width: auto; height:auto; max-height: 90px">
                     </div>
-                    <div class="col">
+                    <div class="col d-flex flex-column justify-content-">
                         <h5>Rank: <span></span></h5>
                         <h5>Score: <span></span></h5>
                         <h5>Price: $<span></span></h5>
@@ -44,7 +45,7 @@
                 </div>
             </div>
             <div class="col-auto" id="gpu-info">
-                <a class="table-row-link">
+                <a class="pcpair-color accent-link-hover">
                     <h2 id="gpu-name"></h2>
                 </a>
                 <div class="row no-gutters">
@@ -81,6 +82,14 @@
                 <div class="pair-info-headers col">
                     <h4>Score/Price: <span></span></h4>
                 </div>
+            </div>
+            <div class="chart-container text-center py-2 mt-5">
+                <span class="h6">Price History</span>
+                <div id="price-history-chart"></div>
+            </div>
+            <div class="chart-container text-center py-2 mt-5">
+                <span class="h6">Score History</span>
+                <div id="score-history-chart"></div>
             </div>
         </div>
     </div>

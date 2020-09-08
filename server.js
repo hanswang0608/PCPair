@@ -43,7 +43,7 @@ mongoose.connect(mongoURI,
 const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
 
-// scrape();
+scrape();
 
 // --- DISABLED --- 
 //Main scrape function that runs on heroku worker
@@ -57,4 +57,7 @@ async function scrape() {
         await scraper.scrapeAllGPUs(browser);
         await scraper.queryPairsNew();
     }
+    // await scraper.scrapeCPU(browser);
+    // await scraper.scrapeAllGPUs(browser);
+    // await scraper.queryPairsNew();
 }

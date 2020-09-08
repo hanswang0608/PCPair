@@ -16,6 +16,14 @@ const GPUSchema = new Schema({
     company: {
         type: String,
     },
+    online: {
+        type: Boolean,
+        required: true
+    },
+    instore: {
+        type: Boolean,
+        required: true
+    },
     variants: [{
         name: {type: String, required: true},
         price: Number,
@@ -39,12 +47,17 @@ const GPUSchema = new Schema({
     },
     score: {
         type: Number
-    },
+    }, scoreHistory: [{
+        score: Number, date: Date
+    }],
     rank: {
         type: Number
     },
     ccLink: {
         type: String
+    },
+    percentage: {
+        type: Number
     }
 }, {collation: {locale: 'en', strength: 2}});
 
