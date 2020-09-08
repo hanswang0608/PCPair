@@ -1,0 +1,11 @@
+{
+    "relativeGPU": "GeForce RTX 2070",
+    "relativeCPU": "AMD Ryzen 5 3600",
+    "CPUBlacklist": [
+        "athlon",
+        "pentium",
+        "10700KA"
+    ],
+    "navigationTimeout": 300000,
+    "onCCThreshold": 600
+}

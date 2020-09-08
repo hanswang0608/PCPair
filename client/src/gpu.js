@@ -1,6 +1,4 @@
-import {getGPU} from './apis.js';
-
-let res;
+import {getGPU, getPair} from './apis.js';
 
 const searchParams = new URLSearchParams(window.location.search);
 const gpuname = searchParams.get('gpuname');
@@ -13,32 +11,66 @@ const gpuInfoHeadersRef = gpuInfoRef.querySelectorAll('.gpu-info-header');
 const buyInfoRef = document.getElementById('buy-info');
 const buyInfoCellsRef = buyInfoRef.querySelectorAll('td');
 
-getGPUInfo(gpuname);
+let GPURes, pairRes;
 
-async function getGPUInfo(gpuname) {
-    res = (await getGPU({name: gpuname})).data;
-    console.log(res);
-    gpuImgRef.src = res.img;
-    gpuImgRef.alt = res.name;
-    gpuNameRef.innerHTML = res.name;
-    gpuNameLinkRef.href = `/gpu/?gpuname=${res.name}`;
-    gpuInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    gpuInfoHeadersRef[1].innerHTML = res.score;
-    gpuInfoHeadersRef[2].innerHTML = res.price;
-    gpuInfoHeadersRef[3].innerHTML = res.priceToPerf;
-
-    res.onCC ? buyInfoCellsRef[0].querySelector('a').href = res.ccLink : '';
-    res.onCC ? buyInfoCellsRef[1].innerHTML = `$${res.price}` : buyInfoCellsRef[1].innerHTML = '-';
-    buyInfoCellsRef[2].innerHTML = res.instore ? 'Yes' : 'No';
-    buyInfoCellsRef[3].innerHTML = res.online ? 'Yes' : 'No';
-    res.onCC ? buyInfoCellsRef[4].querySelector('a').href = res.ccLink : buyInfoCellsRef[4].querySelector('a').innerHTML = '';
-
-    return res;
+async function init() {
+    await getGPUInfo(gpuname);
+    await getPairInfo(gpuname);
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(() => drawPriceChart(GPURes));
+    // google.charts.setOnLoadCallback(() => drawStackChart(pairRes));
+    google.charts.setOnLoadCallback(() => drawScoreChart(GPURes));
 }
 
-google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(() => drawPriceChart(res));
-google.charts.setOnLoadCallback(() => drawScoreChart(res));
+init();
+
+async function getGPUInfo(gpuname) {
+    GPURes = (await getGPU({name: gpuname})).data;
+    console.log(GPURes);
+    gpuImgRef.src = GPURes.img;
+    gpuImgRef.alt = GPURes.name;
+    gpuNameRef.innerHTML = GPURes.name;
+    gpuNameLinkRef.href = `/gpu/?gpuname=${GPURes.name}`;
+    gpuInfoHeadersRef[0].innerHTML = `${GPURes.rank} of ${GPURes.total}`;
+    gpuInfoHeadersRef[1].innerHTML = `${GPURes.percentage}%`;
+    gpuInfoHeadersRef[2].innerHTML = GPURes.score;
+    gpuInfoHeadersRef[3].innerHTML = GPURes.price;
+    gpuInfoHeadersRef[4].innerHTML = GPURes.priceToPerf;
+
+    GPURes.onCC ? buyInfoCellsRef[0].querySelector('a').href = GPURes.ccLink : '';
+    GPURes.onCC ? buyInfoCellsRef[1].innerHTML = `$${GPURes.price}` : buyInfoCellsRef[1].innerHTML = '-';
+    buyInfoCellsRef[2].innerHTML = GPURes.instore ? 'Yes' : 'No';
+    buyInfoCellsRef[3].innerHTML = GPURes.online ? 'Yes' : 'No';
+    GPURes.onCC ? buyInfoCellsRef[4].querySelector('a').href = GPURes.ccLink : buyInfoCellsRef[4].querySelector('a').innerHTML = '';
+}
+
+async function getPairInfo(gpuname) {
+    pairRes = (await getPair({gpu: gpuname})).data.filter(pair => pair.score && pair.price < 2000).sort((a, b) => a.score >= b.score ? -1 : 1);
+    console.log(pairRes);
+}
+
+function drawStackChart(res) {
+    const stackData = [['Price', 'Score']];
+    res.forEach(pair => {
+        stackData.push([pair.price, pair.score]);
+    });
+
+    var data = google.visualization.arrayToDataTable(stackData);
+
+    var options = {
+        legend: {position: 'bottom'},
+        hAxis: {title: 'Price', minValue: 1000, maxValue: 2000, titleTextStyle: {italic: false}},
+        vAxis: {title: 'Score', minValue: 0, maxValue: 10000, titleTextStyle: {italic: false}},
+        colors: ['#40a8c4'],
+        legend: 'none',
+    };
+
+    var chart = new google.visualization.ScatterChart(document.getElementById('stack-chart'));
+
+    chart.draw(data, options);
+
+    chart.getAction('s');
+}
 
 function drawScoreChart(res) {
     const scoreData = [['Date', 'Score']];
@@ -74,6 +106,7 @@ function drawScoreChart(res) {
 
     chart.draw(data, options);
 }
+
 function drawPriceChart(res) {
     const priceData = [['Date', 'Price']];
     res.priceHistory.forEach(price => {
@@ -104,7 +137,7 @@ function drawPriceChart(res) {
         colors: ['#40a8c4']
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('price-history-chart'));
+    var chart = new google.visualization.SteppedAreaChart(document.getElementById('price-history-chart'));
 
     chart.draw(data, options);
 }

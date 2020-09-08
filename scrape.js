@@ -25,4 +25,5 @@ async function scrape() {
     await scraper.queryPairsNew();
     await browser.close();
     console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
+    process.exit();
 }

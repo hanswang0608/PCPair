@@ -12,6 +12,7 @@ getGPUs().then(res => {
             `<tr class="table-row pcpair-color-hover">
                 <th><span>${index + 1}</span></th>
                 <td><a class="table-row-link no-deco-link"><span>${el.name}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.percentage.toFixed(1)}</span>%</a></td>
                 <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
                 <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
                 <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>

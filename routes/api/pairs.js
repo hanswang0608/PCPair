@@ -42,7 +42,7 @@ const {isNull} = require('util');
 // });
 
 router.get('/', (req, res) => {
-    if (Object.keys(req.query).length !== 0) {
+    if (req.query.cpu && req.query.gpu) {
         Pair.findOne({cpu: req.query.cpu, gpu: req.query.gpu})
             .then(async data => {
                 if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
@@ -50,6 +50,18 @@ router.get('/', (req, res) => {
                 res.json(data);
             })
             .catch(err => res.status(500).json({success: false, message: 'Get request failed'}));
+    } else if (req.query.cpu) {
+        Pair.find({cpu: req.query.cpu})
+            .then(data => {
+                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                res.json(data);
+            });
+    } else if (req.query.gpu) {
+        Pair.find({gpu: req.query.gpu})
+            .then(data => {
+                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                res.json(data);
+            });
     } else {
         Pair.find()
             .then(data => {

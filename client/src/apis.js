@@ -60,7 +60,6 @@ async function getPair(payload) {
 }
 
 async function getPrice(payload) {
-    // const ajaxLoading = document.querySelector('#loading');
     try {
         return await axios.get(`/api/price/`, {
             params: {

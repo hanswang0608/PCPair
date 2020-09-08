@@ -1,6 +1,4 @@
-import {getCPU} from './apis.js';
-
-let res;
+import {getCPU, getPair} from './apis.js';
 
 const searchParams = new URLSearchParams(window.location.search);
 const cpuname = searchParams.get('cpuname');
@@ -13,32 +11,66 @@ const cpuInfoHeadersRef = cpuInfoRef.querySelectorAll('.cpu-info-header');
 const buyInfoRef = document.getElementById('buy-info');
 const buyInfoCellsRef = buyInfoRef.querySelectorAll('td');
 
-getCPUInfo(cpuname);
+let CPURes, pairRes;
 
-async function getCPUInfo(cpuname) {
-    res = (await getCPU({name: cpuname})).data;
-    console.log(res);
-    cpuImgRef.src = res.img;
-    cpuImgRef.alt = res.name;
-    cpuNameRef.innerHTML = res.name;
-    cpuNameLinkRef.href = `/cpu/?cpuname=${res.name}`;
-    cpuInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    cpuInfoHeadersRef[1].innerHTML = res.score;
-    cpuInfoHeadersRef[2].innerHTML = res.price;
-    cpuInfoHeadersRef[3].innerHTML = res.priceToPerf;
-
-    res.onCC ? buyInfoCellsRef[0].querySelector('a').href = res.ccLink : '';
-    res.onCC ? buyInfoCellsRef[1].innerHTML = `$${res.price}` : buyInfoCellsRef[1].innerHTML = '-';
-    buyInfoCellsRef[2].innerHTML = res.instore ? 'Yes' : 'No';
-    buyInfoCellsRef[3].innerHTML = res.online ? 'Yes' : 'No';
-    res.onCC ? buyInfoCellsRef[4].querySelector('a').href = res.ccLink : buyInfoCellsRef[4].querySelector('a').innerHTML = '';
-
-    return res;
+async function init() {
+    await getCPUInfo(cpuname);
+    await getPairInfo(cpuname);
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(() => drawPriceChart(CPURes));
+    // google.charts.setOnLoadCallback(() => drawStackChart(pairRes));
+    google.charts.setOnLoadCallback(() => drawScoreChart(CPURes));
 }
 
-google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(() => drawPriceChart(res));
-google.charts.setOnLoadCallback(() => drawScoreChart(res));
+init();
+
+async function getCPUInfo(cpuname) {
+    CPURes = (await getCPU({name: cpuname})).data;
+    console.log(CPURes);
+    cpuImgRef.src = CPURes.img;
+    cpuImgRef.alt = CPURes.name;
+    cpuNameRef.innerHTML = CPURes.name;
+    cpuNameLinkRef.href = `/cpu/?cpuname=${CPURes.name}`;
+    cpuInfoHeadersRef[0].innerHTML = `${CPURes.rank} of ${CPURes.total}`;
+    cpuInfoHeadersRef[1].innerHTML = `${CPURes.percentage}%`;
+    cpuInfoHeadersRef[2].innerHTML = CPURes.score;
+    cpuInfoHeadersRef[3].innerHTML = CPURes.price;
+    cpuInfoHeadersRef[4].innerHTML = CPURes.priceToPerf;
+
+    CPURes.onCC ? buyInfoCellsRef[0].querySelector('a').href = CPURes.ccLink : '';
+    CPURes.onCC ? buyInfoCellsRef[1].innerHTML = `$${CPURes.price}` : buyInfoCellsRef[1].innerHTML = '-';
+    buyInfoCellsRef[2].innerHTML = CPURes.instore ? 'Yes' : 'No';
+    buyInfoCellsRef[3].innerHTML = CPURes.online ? 'Yes' : 'No';
+    CPURes.onCC ? buyInfoCellsRef[4].querySelector('a').href = CPURes.ccLink : buyInfoCellsRef[4].querySelector('a').innerHTML = '';
+}
+
+async function getPairInfo(cpuname) {
+    pairRes = (await getPair({cpu: cpuname})).data.filter(pair => pair.score && pair.price < 3000).sort((a, b) => a.score >= b.score ? -1 : 1);
+    console.log(pairRes);
+}
+
+function drawStackChart(res) {
+    const stackData = [['Price', 'Score']];
+    res.forEach(pair => {
+        stackData.push([pair.price, pair.score]);
+    });
+
+    var data = google.visualization.arrayToDataTable(stackData);
+
+    var options = {
+        legend: {position: 'bottom'},
+        hAxis: {title: 'Price', minValue: 1000, maxValue: 2000, titleTextStyle: {italic: false}},
+        vAxis: {title: 'Score', minValue: 0, maxValue: 10000, titleTextStyle: {italic: false}},
+        colors: ['#40a8c4'],
+        legend: 'none',
+    };
+
+    var chart = new google.visualization.ScatterChart(document.getElementById('stack-chart'));
+
+    chart.draw(data, options);
+
+    chart.getAction('s');
+}
 
 function drawScoreChart(res) {
     const scoreData = [['Date', 'Score']];
@@ -62,7 +94,6 @@ function drawScoreChart(res) {
         for (let i = 0; i < 5; i++) {
             result.push(Math.round(intervalMin + i * increment).toFixed(2));
         }
-        console.log(Math.pow(10, Math.floor(Math.log(res.score) / Math.LN10) - 1));
         return result;
     }
     var options = {
@@ -75,6 +106,7 @@ function drawScoreChart(res) {
 
     chart.draw(data, options);
 }
+
 function drawPriceChart(res) {
     const priceData = [['Date', 'Price']];
     res.priceHistory.forEach(price => {
@@ -105,7 +137,7 @@ function drawPriceChart(res) {
         colors: ['#40a8c4']
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('price-history-chart'));
+    var chart = new google.visualization.SteppedAreaChart(document.getElementById('price-history-chart'));
 
     chart.draw(data, options);
 }

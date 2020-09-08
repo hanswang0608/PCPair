@@ -7,6 +7,8 @@ const CPU = require('./models/CPU');
 const GPU = require('./models/GPU');
 const Pair = require('./models/Pair');
 
+const scraperConfig = require('./config/scraper-config.json');
+
 const nodeLevenshtein = require('node-levenshtein');
 const {isNull, isUndefined} = require('util');
 
@@ -141,14 +143,15 @@ async function queryPairsNew(priceTarget) {
         else return 1;
     });
     const highestScore = pairArr[0].score;
+    const baselineScore = (await Pair.findOne({cpu: scraperConfig.relativeCPU, gpu: scraperConfig.relativeGPU})).score;
     for ([index, pair] of pairArr.entries()) {
         if (pair.score === 0) {
             for (zeroScorePair of pairArr.slice(index)) {
-                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1, percentage: 0});
+                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1, percentage: 0, maxPercentage: 0});
             }
             break;
         }
-        await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1, percentage: (pair.score / highestScore * 100).toFixed(2)});
+        await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1, percentage: (pair.score / baselineScore * 100).toFixed(2), maxPercentage: (pair.score / highestScore * 100).toFixed(2)});
     }
 
     console.log('Done All');
@@ -163,6 +166,23 @@ async function scrapeAllGPUs(browser) {
     }
     // console.log(GPUs);
     // await Promise.all(promises);
+    const GPUArr = await GPU.find();
+    GPUArr.sort((a, b) => {
+        if (a.score >= b.score) return -1;
+        else return 1;
+    });
+    const highestScore = GPUArr[0].score;
+    const baselineScore = (await GPU.findOne({name: scraperConfig.relativeGPU})).score;
+    for ([index, gpu] of GPUArr.entries()) {
+        let onCC;
+        if ((new Date() - gpu.lastModified) / 1000 < scraperConfig.onCCThreshold) {
+            onCC = true;
+        } else {
+            onCC = false;
+        }
+        await GPU.updateOne({name: gpu.name},
+            {onCC, rank: index + 1, percentage: (gpu.score / baselineScore * 100).toFixed(2), maxPercentage: (gpu.score / highestScore * 100).toFixed(2)});
+    }
     console.log('All GPUs Finished Scraping');
 }
 
@@ -244,19 +264,19 @@ async function scrapeDiv(page, product) {
 
     // Wait for page to load
     await page.waitForSelector(`#product-list > div:nth-child(2) > div span.text-dark.d-block.productTemplate_title a`, {
-        timeout: 300000
+        timeout: scraperConfig.navigationTimeout
     });
     await page.waitForSelector(`#product-list > div:nth-child(2) > div span.d-block.mb-0.pq-hdr-product_price.line-height strong`, {
-        timeout: 300000
+        timeout: scraperConfig.navigationTimeout
     });
     await page.waitForSelector(`#product-list > div:nth-child(2) > div div div img`, {
-        timeout: 300000
+        timeout: scraperConfig.navigationTimeout
     });
     await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(1) small`, {
-        timeout: 300000
+        timeout: scraperConfig.navigationTimeout
     });
     await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(2) small`, {
-        timeout: 300000
+        timeout: scraperConfig.navigationTimeout
     });
 
     loopDivs: do {
@@ -278,13 +298,7 @@ async function scrapeDiv(page, product) {
             newProduct.name = newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)[0];
         }
 
-        const blacklist = [
-            'athlon',
-            'pentium',
-            '10700KA'
-        ];
-
-        for (item of blacklist) {
+        for (item of scraperConfig.CPUBlacklist) {
             if (newProduct.name.match(new RegExp(item, 'i'))) {
                 console.log(`${newProduct.name} was skipped`);
                 counter += 2;
@@ -418,21 +432,6 @@ async function scrapeDiv(page, product) {
                 price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(),
                 ccLink: page.url(), online: variantsArr.some(variant => variant.online), instore: variantsArr.some(variant => variant.instore)
             });
-
-        const GPUArr = await GPU.find();
-        GPUArr.sort((a, b) => {
-            if (a.score >= b.score) return -1;
-            else return 1;
-        });
-        const highestScore = GPUArr[0].score;
-        for ([index, gpu] of GPUArr.entries()) {
-            if (!gpu.lastModified || (new Date() - gpu.lastModified) / 1000 > 600) {
-                await GPU.updateOne({name: gpu.name}, {onCC: false, rank: index + 1, percentage: (gpu.score / highestScore * 100).toFixed(2)});
-            } else {
-                await GPU.updateOne({name: gpu.name}, {onCC: true, rank: index + 1, percentage: (gpu.score / highestScore * 100).toFixed(2)});
-            }
-        }
-
     }
 
     if (isCPU) {
@@ -442,21 +441,23 @@ async function scrapeDiv(page, product) {
             else return 1;
         });
         const highestScore = CPUArr[0].score;
+        const baselineScore = (await CPU.findOne({name: scraperConfig.relativeCPU})).score;
         for ([index, cpu] of CPUArr.entries()) {
-            if ((new Date() - cpu.lastModified) / 1000 > 600) {
-                await CPU.updateOne({name: cpu.name}, {onCC: false, rank: index + 1, percentage: (cpu.score / highestScore * 100).toFixed(2)});
+            let onCC;
+            if ((new Date() - cpu.lastModified) / 1000 < scraperConfig.onCCThreshold) {
+                onCC = true;
             } else {
-                await CPU.updateOne({name: cpu.name}, {onCC: true, rank: index + 1, percentage: (cpu.score / highestScore * 100).toFixed(2)});
+                onCC = false;
             }
+            console.log(onCC);
+            await CPU.updateOne({name: cpu.name},
+                {onCC, rank: index + 1, percentage: (cpu.score / baselineScore * 100).toFixed(2), maxPercentage: (cpu.score / highestScore * 100).toFixed(2)});
         }
     }
     // console.log(`Finished Scraping ${isCPU ? 'CPU' : 'GPU'}`);
 }
 
 async function scrapeId(name, isCPU) {
-    // if (name.toLowerCase().includes('intel')) {
-    //     name += ' Processor';
-    // }
     const idQueryURL = encodeURI(`https://www.3dmark.com/proxycon/ajax/search/${isCPU ? 'cpuname' : 'gpuname'}?term=${name}`);
     const res = (await axios.get(idQueryURL)).data;
     if (res.length === 0) {
@@ -582,7 +583,7 @@ async function loadFullPage(page) {
             await page.click('#load_more > button');
             await page.waitForSelector('#loading', {
                 hidden: true,
-                timeout: 300000
+                timeout: scraperConfig.navigationTimeout
             });
             count = await page.$$eval('#product-list > div.col-xl-3.col-lg-4.col-6.mt-0_5.px-0_5.toggleBox.mb-1', divs => divs.length);
             moreToLoad = await page.$eval('#load_more', div => div.className) === 'pb-3 text-center text-uppercase text-muted';

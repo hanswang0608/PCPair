@@ -66,40 +66,10 @@ searchCollapseButtonRef.addEventListener('click', () => {
     }
 });
 
-console.log(document.body.style.fontFamily);
 // Listen for view more button
 viewMoreRef.addEventListener('click', () => {
-    const resultPricePerf = res.data[1];
-    resultPricePerfRef.innerHTML = (resultPricePerf.map((el, index) =>
-        `<tr class="table-row pcpair-color-hover">
-            <th><span>${index + 1}</span></th>
-            <td><a class="table-row-link no-deco-link"><span>${el.cpu}</span></a></td>
-            <td><a class="table-row-link no-deco-link"><span>${el.gpu}</span></a></td>
-            <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
-            <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
-            <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>
-        </tr>`
-    )).join('');
-    document.querySelectorAll('.table-row').forEach(el => {
-        const cpuName = el.querySelectorAll('span')[1].innerHTML;
-        const gpuName = el.querySelectorAll('span')[2].innerHTML;
-        el.querySelectorAll('a').forEach(a => a.href = `/pair/?cpuname=${cpuName}&gpuname=${gpuName}`);
-    });
-    document.querySelectorAll('.table-row-link').forEach(td => {
-        td.addEventListener('hover', () => {
-            td.parentElement.style.backgroundColor = 'black';
-            console.log('hovered');
-        });
-    });
-
+    populateResults(15);
     viewMoreRef.style.display = 'none';
-
-    document.querySelectorAll('.table-row-link').forEach(td => {
-        td.addEventListener('hover', () => {
-            td.parentElement.style.backgroundColor = 'black';
-            console.log('hovered');
-        });
-    });
 });
 
 
@@ -108,26 +78,9 @@ async function priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand) {
     ajaxLoadingRef.style.display = 'inline-block';
     res = await getPrice({price, tolerance, discontinued, cpuBrand, gpuBrand});
     ajaxLoadingRef.style.display = 'none';
-    console.log(res.data);
-    const resultPerf = res.data[0].slice(0, 3);
-    const resultPricePerf = res.data[1].slice(0, 5);
-    resultPricePerfRef.innerHTML = (resultPricePerf.map((el, index) =>
-        `<tr class="table-row pcpair-color-hover">
-                <th><span>${index + 1}</span></th>
-                <td><a class="table-row-link no-deco-link"><span>${el.cpu}</span></a></td>
-                <td><a class="table-row-link no-deco-link"><span>${el.gpu}</span></a></td>
-                <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
-                <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
-                <td><a class="table-row-link no-deco-link"><span>${el.priceToPerf}</span></a></td>
-            </tr>`
-    )).join('');
+    // console.log(res.data);
+    populateResults(5);
     viewMoreRef.style.display = 'block';
-    document.querySelectorAll('.table-row').forEach(el => {
-        const cpuName = el.querySelectorAll('span')[1].innerHTML;
-        const gpuName = el.querySelectorAll('span')[2].innerHTML;
-        el.querySelectorAll('a').forEach(a => a.href = `/pair/?cpuname=${cpuName}&gpuname=${gpuName}`);
-    });
-
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
         const table = th.closest('table');
         const tbody = table.querySelector('tbody');
@@ -135,4 +88,24 @@ async function priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand) {
             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
             .forEach(tr => tbody.appendChild(tr));
     })));
+}
+
+function populateResults(n) {
+    const resultPerf = res.data[0].slice(0, n);
+    const resultPricePerf = res.data[1].slice(0, n);
+    resultPricePerfRef.innerHTML = (resultPricePerf.map((el, index) =>
+        `<tr class="table-row pcpair-color-hover">
+                <th><span>${index + 1}</span></th>
+                <td><a class="table-row-link no-deco-link"><span>${el.cpu}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.gpu}</span></a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.percentage.toFixed(1)}</span>%</a></td>
+                <td><a class="table-row-link no-deco-link"><span>${el.score}</span></a></td>
+                <td><a class="table-row-link no-deco-link">$<span>${el.price}</span></a></td>
+            </tr>`
+    )).join('');
+    document.querySelectorAll('.table-row').forEach(el => {
+        const cpuName = el.querySelectorAll('span')[1].innerHTML;
+        const gpuName = el.querySelectorAll('span')[2].innerHTML;
+        el.querySelectorAll('a').forEach(a => a.href = `/pair/?cpuname=${cpuName}&gpuname=${gpuName}`);
+    });
 }

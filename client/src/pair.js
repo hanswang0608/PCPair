@@ -1,7 +1,5 @@
 import {getCPU, getGPU, getPair} from './apis.js';
 
-let res;
-
 const cpuInfoRef = document.getElementById('cpu-info');
 const gpuInfoRef = document.getElementById('gpu-info');
 const pairInfoRef = document.getElementById('pair-info');
@@ -9,13 +7,26 @@ const searchParams = new URLSearchParams(window.location.search);
 const cpuname = searchParams.get('cpuname');
 const gpuname = searchParams.get('gpuname');
 
+let res;
+
+async function init() {
+    const promises = [getPairInfo(cpuname, gpuname), getCPUInfo(cpuname), getGPUInfo(gpuname)];
+    await Promise.all(promises);
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(() => drawScoreChart(res));
+    google.charts.setOnLoadCallback(() => drawPriceChart(res));
+};
+
+init();
+
 async function getPairInfo(cpuname, gpuname) {
     res = (await getPair({cpu: cpuname, gpu: gpuname})).data;
-    const pairInfoHeadersRef = pairInfoRef.querySelectorAll('span');
+    const pairInfoHeadersRef = pairInfoRef.querySelectorAll('.pair-info-headers');
     pairInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    pairInfoHeadersRef[1].innerHTML = res.score || 'Not Benchmarked';
-    pairInfoHeadersRef[2].innerHTML = res.price;
-    pairInfoHeadersRef[3].innerHTML = res.priceToPerf || 'Not Benchmarked';
+    pairInfoHeadersRef[1].innerHTML = res.price;
+    pairInfoHeadersRef[2].innerHTML = `${res.percentage}%`;
+    pairInfoHeadersRef[3].innerHTML = res.score || 'Not Benchmarked';
+    pairInfoHeadersRef[4].innerHTML = res.priceToPerf || 'Not Benchmarked';
 }
 
 
@@ -31,8 +42,9 @@ async function getCPUInfo(cpuname) {
     cpuNameLinkRef.href = `/cpu/?cpuname=${res.name}`;
     const cpuInfoHeadersRef = cpuInfoRef.querySelectorAll('span');
     cpuInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    cpuInfoHeadersRef[1].innerHTML = res.score;
-    cpuInfoHeadersRef[2].innerHTML = res.price;
+    cpuInfoHeadersRef[1].innerHTML = `${res.percentage}%`;
+    cpuInfoHeadersRef[2].innerHTML = res.score;
+    cpuInfoHeadersRef[3].innerHTML = res.price;
 
     // cpuInfoRef.innerHTML =
     //     `
@@ -54,8 +66,9 @@ async function getGPUInfo(gpuname) {
     gpuNameLinkRef.href = `/gpu/?gpuname=${res.name}`;
     const gpuInfoHeadersRef = gpuInfoRef.querySelectorAll('span');
     gpuInfoHeadersRef[0].innerHTML = `${res.rank} of ${res.total}`;
-    gpuInfoHeadersRef[1].innerHTML = res.score;
-    gpuInfoHeadersRef[2].innerHTML = res.price;
+    gpuInfoHeadersRef[1].innerHTML = `${res.percentage}%`;
+    gpuInfoHeadersRef[2].innerHTML = res.score;
+    gpuInfoHeadersRef[3].innerHTML = res.price;
     // gpuInfoRef.innerHTML =
     //     `
     //     <h2>${res.name}</h2>
@@ -64,18 +77,6 @@ async function getGPUInfo(gpuname) {
     //     <h3>${res.score}</h3>
     // `;
 }
-
-async function init() {
-    const promises = [getPairInfo(cpuname, gpuname), getCPUInfo(cpuname), getGPUInfo(gpuname)];
-    await Promise.all(promises);
-
-};
-
-init();
-
-google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(() => drawScoreChart(res));
-google.charts.setOnLoadCallback(() => drawPriceChart(res));
 
 function drawScoreChart(res) {
     const scoreData = [['Date', 'Score']];
@@ -141,7 +142,7 @@ function drawPriceChart(res) {
         colors: ['#40a8c4']
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('price-history-chart'));
+    var chart = new google.visualization.SteppedAreaChart(document.getElementById('price-history-chart'));
 
     chart.draw(data, options);
 }

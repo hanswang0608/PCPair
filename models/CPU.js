@@ -64,6 +64,9 @@ const CPUSchema = new Schema({
     },
     percentage: {
         type: Number
+    },
+    maxPercentage: {
+        type: Number
     }
 }, {collation: {locale: 'en', strength: 2}});
 
