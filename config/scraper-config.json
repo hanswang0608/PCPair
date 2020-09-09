@@ -1,6 +1,6 @@
 {
     "relativeGPU": "GeForce RTX 2070",
-    "relativeCPU": "AMD Ryzen 5 3600",
+    "relativeCPU": "AMD Ryzen 7 3700X",
     "CPUBlacklist": [
         "athlon",
         "pentium",

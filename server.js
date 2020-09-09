@@ -11,6 +11,9 @@ const cpus = require('./routes/api/cpus');
 const pairs = require('./routes/api/pairs');
 const price = require('./routes/api/price');
 const routes = require('./routes/routes');
+
+const CPU = require('./models/CPU');
+const GPU = require('./models/GPU');
 const Pair = require('./models/Pair');
 
 
@@ -44,7 +47,7 @@ mongoose.connect(mongoURI,
 const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
 
-// scrape();
+scrape();
 
 // --- DISABLED --- 
 //Main scrape function that runs on heroku worker

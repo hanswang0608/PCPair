@@ -263,24 +263,17 @@ async function scrapeDiv(page, product) {
     let namesArr = [];
 
     // Wait for page to load
-    await page.waitForSelector(`#product-list > div:nth-child(2) > div span.text-dark.d-block.productTemplate_title a`, {
+    await page.waitForSelector(`#product-list > div:nth-child(${counter}) > div span.text-dark.d-block.productTemplate_title a`, {
         timeout: scraperConfig.navigationTimeout
     });
-    await page.waitForSelector(`#product-list > div:nth-child(2) > div span.d-block.mb-0.pq-hdr-product_price.line-height strong`, {
+    await page.waitForSelector(`#product-list > div:nth-child(${counter}) > div span.d-block.mb-0.pq-hdr-product_price.line-height strong`, {
         timeout: scraperConfig.navigationTimeout
     });
-    await page.waitForSelector(`#product-list > div:nth-child(2) > div div div img`, {
-        timeout: scraperConfig.navigationTimeout
-    });
-    await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(1) small`, {
-        timeout: scraperConfig.navigationTimeout
-    });
-    await page.waitForSelector(`#product-list > div:nth-child(2) > div a.stock-popup.pointer div:nth-child(2) small`, {
+    await page.waitForSelector(`#product-list > div:nth-child(${counter}) > div div div img`, {
         timeout: scraperConfig.navigationTimeout
     });
 
     loopDivs: do {
-        // console.log('start of loop');
         div = await page.$(`#product-list > div:nth-child(${counter}) > div`);
         if (!div) break;
 
@@ -375,7 +368,7 @@ async function scrapeDiv(page, product) {
 
         newProduct.lastModified = Date.now();
 
-        newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href);
+        try {newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href);} catch (e) {newProduct.ccLink = 'https://www.canadacomputers.com/index.php';};
 
         // console.log('scraped data');
 
@@ -408,10 +401,18 @@ async function scrapeDiv(page, product) {
     } while (div);
 
     if (!isCPU) {
-        const sumVariantsPrice = variantsArr.reduce((acc, cur) => {
-            return acc + cur.price;
-        }, 0);
-        const productPrice = Math.round(sumVariantsPrice / variantsArr.length * 100) / 100;
+        // const sumVariantsPrice = variantsArr.reduce((acc, cur) => {
+        //     return acc + cur.price;
+        // }, 0);
+        // const productPrice = Math.round(sumVariantsPrice / variantsArr.length * 100) / 100;
+
+        variantsArr = variantsArr.sort((a, b) => b - a);
+        let productPrice;
+        if (variantsArr.length % 2 === 0) {
+            productPrice = (variantsArr[variantsArr.length / 2 - 1].price + variantsArr[variantsArr.length / 2].price) / 2;
+        } else {
+            productPrice = variantsArr[Math.floor(variantsArr.length / 2)].price;
+        }
 
         let priceHistory;
         try {
@@ -449,7 +450,6 @@ async function scrapeDiv(page, product) {
             } else {
                 onCC = false;
             }
-            console.log(onCC);
             await CPU.updateOne({name: cpu.name},
                 {onCC, rank: index + 1, percentage: (cpu.score / baselineScore * 100).toFixed(2), maxPercentage: (cpu.score / highestScore * 100).toFixed(2)});
         }

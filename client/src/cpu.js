@@ -15,7 +15,7 @@ let CPURes, pairRes;
 
 async function init() {
     await getCPUInfo(cpuname);
-    await getPairInfo(cpuname);
+    // await getPairInfo(cpuname);
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.setOnLoadCallback(() => drawPriceChart(CPURes));
     // google.charts.setOnLoadCallback(() => drawStackChart(pairRes));

@@ -15,7 +15,7 @@ let GPURes, pairRes;
 
 async function init() {
     await getGPUInfo(gpuname);
-    await getPairInfo(gpuname);
+    // await getPairInfo(gpuname);
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.setOnLoadCallback(() => drawPriceChart(GPURes));
     // google.charts.setOnLoadCallback(() => drawStackChart(pairRes));
