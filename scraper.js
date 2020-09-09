@@ -284,8 +284,13 @@ async function scrapeDiv(page, product) {
 
         // Create new object to hold product info
         const newProduct = new Object();
-
-        newProduct.name = await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent);
+        try {
+            newProduct.name = await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent);
+        } catch (e) {
+            setTimeout(async () => {
+                newProduct.name = await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent);
+            }, 3000);
+        }
         if (isCPU && newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)) {
             //Trim CPU names
             newProduct.name = newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)[0];
@@ -317,8 +322,13 @@ async function scrapeDiv(page, product) {
         namesArr.push(newProduct.name);
 
         //await page.screenshot({ path: `C:/Users/HansW/OneDrive/Desktop/ccload.png`, type: 'png' });
-        newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
-
+        try {
+            newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
+        } catch (e) {
+            setTimeout(async () => {
+                newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
+            }, 3000);
+        }
         if (isCPU) {
             try {
                 newProduct.priceHistory = [...(await CPU.findOne({name: newProduct.name})).priceHistory];
@@ -351,7 +361,14 @@ async function scrapeDiv(page, product) {
         // delete items that are no longer on CC
 
 
-        newProduct.img = await div.$eval('div div img', img => img.src);
+        try {
+            newProduct.img = await div.$eval('div div img', img => img.src);
+        } catch (e) {
+            setTimeout(async () => {
+                newProduct.img = await div.$eval('div div img', img => img.src);
+            }, 3000);
+        }
+
         newProduct.TS = '';
         try {newProduct.company = await div.$eval('div.pq-img-manu_logo_box img', img => img.alt);} catch (e) {newProduct.company = undefined;}
         let onlineStatus, instoreStatus;
