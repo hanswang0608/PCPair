@@ -76,7 +76,7 @@ function drawScoreChart(res) {
     const scoreData = [['Date', 'Score']];
     res.scoreHistory.forEach(score => {
         const date = new Date(score.date);
-        const dateStr = `${date.getMonth()}/${date.getDate()}`;
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
         scoreData.push([`${dateStr}`, score.score]);
     });
 
@@ -111,7 +111,7 @@ function drawPriceChart(res) {
     const priceData = [['Date', 'Price']];
     res.priceHistory.forEach(price => {
         const date = new Date(price.date);
-        const dateStr = `${date.getMonth()}/${date.getDate()}`;
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
         priceData.push([`${dateStr}`, price.price]);
     });
 
