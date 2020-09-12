@@ -47,7 +47,7 @@ mongoose.connect(mongoURI,
 const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
 
-// scrape();
+scrape();
 
 // --- DISABLED --- 
 //Main scrape function that runs on heroku worker
@@ -61,7 +61,17 @@ async function scrape() {
         await scraper.scrapeAllGPUs(browser);
         await scraper.queryPairsNew();
     }
-    await scraper.scrapeCPU(browser);
+    // await scraper.scrapeCPU(browser);
     await scraper.scrapeAllGPUs(browser);
-    await scraper.queryPairsNew();
+    // await scraper.queryPairsNew();
 }
+
+
+// const nameCheck = 'RX vega 56'.replace(/GeForce/i, '').replace(/RTX/i, '').replace(/Radeon/i, '').replace(/RX/i, '').trim();
+// console.log(nameCheck);
+
+// const nameCheck = new RegExp('Radeon RX 5700XT'.replace('GeForce', '').replace('RTX', '').replace('Radeon', '').replace('RX', '').replace(/ /g, ''), 'i');
+// console.log(nameCheck);
+// console.log(Boolean('ASUS ROG STRIX Radeon RX 5700 XT Overclocked 8G GDDR6 HDMI DP'.replace(/ /g, '').match(nameCheck)));
+
+// console.log(549.00.toFixed(2));

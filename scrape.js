@@ -17,7 +17,7 @@ var scrp = schedule.scheduleJob('0 0 * * *', scrape);
 
 console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 
-scrape();
+// scrape();
 // Scrape function that updates to MongoDB Atlas
 async function scrape() {
     console.log("Hey friends, active here...");
@@ -30,4 +30,19 @@ async function scrape() {
     await browser.close();
     console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
     process.exit();
+}
+
+// Functions for maintenance
+
+// Remove pairs with the specified gpu that has an incorrect pricehistory entry
+async function remove() {
+    const x = await Pair.find({gpu: 'GeForce RTX 2070 Super'});
+    for (pair of x) {
+        for (let i = 0; i < pair.priceHistory.length; i++) {
+            if (pair.priceHistory[i].price > pair.priceHistory[pair.priceHistory.length - 1].price + 200) {
+                pair.priceHistory.splice(i, 1);
+                pair.save();
+            }
+        }
+    }
 }

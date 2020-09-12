@@ -287,13 +287,27 @@ async function scrapeDiv(page, product) {
         try {
             newProduct.name = await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent);
         } catch (e) {
-            setTimeout(async () => {
+            await page.waitFor(3000);
+            try {
                 newProduct.name = await div.$eval('span.text-dark.d-block.productTemplate_title a', a => a.textContent);
-            }, 3000);
+            } catch (e) {
+                console.log(`Cannot read name of div #${counter / 2} in ${isCPU ? 'CPU' : product.name} , skipping`);
+                counter += 2;
+                continue;
+            }
         }
         if (isCPU && newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)) {
             //Trim CPU names
             newProduct.name = newProduct.name.match(/.+?(\d{4,5}[a-z]{0,2})/i)[0];
+        }
+
+        if (!isCPU) {
+            const nameCheck = new RegExp(product.name.replace('GeForce', '').replace('RTX', '').replace('GTX', '').replace('Radeon', '').replace('RX', '').replace(/ /g, ''), 'i');
+            if (!(newProduct.name.replace(/ /g, '').match(nameCheck))) {
+                console.log(`${newProduct.name} does not belong`);
+                counter += 2;
+                continue;
+            }
         }
 
         for (item of scraperConfig.CPUBlacklist) {
@@ -325,9 +339,17 @@ async function scrapeDiv(page, product) {
         try {
             newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
         } catch (e) {
-            setTimeout(async () => {
+            // setTimeout(async () => {
+            //     newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
+            // }, 3000);
+            await page.waitFor(3000);
+            try {
                 newProduct.price = Number(await div.$eval('span.d-block.mb-0.pq-hdr-product_price.line-height strong', strong => strong.textContent.match(/[0-9]{1,3},?[0-9]{1,3}\.?[0-9]+/)[0].replace(/,/g, '')));
-            }, 3000);
+            } catch (e) {
+                console.log(`Cannot read price of div #${counter / 2} in ${isCPU ? 'CPU' : product.name} , skipping`);
+                counter += 2;
+                continue;
+            }
         }
         if (isCPU) {
             try {
@@ -364,9 +386,13 @@ async function scrapeDiv(page, product) {
         try {
             newProduct.img = await div.$eval('div div img', img => img.src);
         } catch (e) {
-            setTimeout(async () => {
+            await page.waitFor(3000);
+            try {
                 newProduct.img = await div.$eval('div div img', img => img.src);
-            }, 3000);
+            } catch (e) {
+                console.log(`Cannot find picture of div #${counter / 2} in ${isCPU ? 'CPU' : product.name}`);
+                newProduct.img = '';
+            }
         }
 
         newProduct.TS = '';
@@ -422,7 +448,7 @@ async function scrapeDiv(page, product) {
         //     return acc + cur.price;
         // }, 0);
         // const productPrice = Math.round(sumVariantsPrice / variantsArr.length * 100) / 100;
-
+        if (variantsArr.length === 0) return;
         variantsArr = variantsArr.sort((a, b) => b - a);
         let productPrice;
         if (variantsArr.length % 2 === 0) {
@@ -430,6 +456,7 @@ async function scrapeDiv(page, product) {
         } else {
             productPrice = variantsArr[Math.floor(variantsArr.length / 2)].price;
         }
+        productPrice = productPrice.toFixed(2);
 
         let priceHistory;
         try {
@@ -438,7 +465,7 @@ async function scrapeDiv(page, product) {
             console.log(`${product.name} is new`);
             priceHistory = [];
         }
-        if (productPrice !== product.price || priceHistory.length === 0) {
+        if (productPrice !== product.price.toFixed(2) || priceHistory.length === 0) {
             priceHistory.push(new Object({
                 price: productPrice,
                 date: Date.now()

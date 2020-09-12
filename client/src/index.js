@@ -80,7 +80,9 @@ async function priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand) {
     ajaxLoadingRef.style.display = 'none';
     // console.log(res.data);
     populateResults(5);
-    viewMoreRef.style.display = 'block';
+    if (res.data[1].length > 5) {
+        viewMoreRef.style.display = 'block';
+    }
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
         const table = th.closest('table');
         const tbody = table.querySelector('tbody');
