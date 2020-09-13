@@ -18,11 +18,9 @@ const GPUSchema = new Schema({
     },
     online: {
         type: Boolean,
-        required: true
     },
     instore: {
         type: Boolean,
-        required: true
     },
     variants: [{
         name: {type: String, required: true},

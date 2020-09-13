@@ -449,7 +449,8 @@ async function scrapeDiv(page, product) {
         // }, 0);
         // const productPrice = Math.round(sumVariantsPrice / variantsArr.length * 100) / 100;
         if (variantsArr.length === 0) return;
-        variantsArr = variantsArr.sort((a, b) => b - a);
+        variantsArr = variantsArr.sort((a, b) => b.price - a.price);
+        variantsArr.forEach(x => console.log(x.price));
         let productPrice;
         if (variantsArr.length % 2 === 0) {
             productPrice = (variantsArr[variantsArr.length / 2 - 1].price + variantsArr[variantsArr.length / 2].price) / 2;
@@ -465,7 +466,7 @@ async function scrapeDiv(page, product) {
             console.log(`${product.name} is new`);
             priceHistory = [];
         }
-        if (productPrice !== product.price.toFixed(2) || priceHistory.length === 0) {
+        if (priceHistory.length === 0 || (productPrice !== priceHistory[priceHistory.length - 1].price.toFixed(2))) {
             priceHistory.push(new Object({
                 price: productPrice,
                 date: Date.now()

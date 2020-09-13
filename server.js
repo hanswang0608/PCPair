@@ -62,7 +62,7 @@ async function scrape() {
         await scraper.queryPairsNew();
     }
     // await scraper.scrapeCPU(browser);
-    await scraper.scrapeAllGPUs(browser);
+    // await scraper.scrapeAllGPUs(browser);
     // await scraper.queryPairsNew();
 }
 
