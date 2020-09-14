@@ -23,19 +23,23 @@ const discontinued = searchParams.get('discontinued');
 const cpuBrand = searchParams.get('cpuBrand');
 const gpuBrand = searchParams.get('gpuBrand');
 
-// Assign form references and set default values
+// Assign element references
 const priceRef = document.querySelector('#price');
 const toleranceRef = document.querySelector('#tolerance');
 const discontinuedRef = document.querySelector('#discontinued');
 const cpuBrandRef = document.querySelector('#cpuBrand');
 const gpuBrandRef = document.querySelector('#gpuBrand');
+const resultAreaRef = document.getElementById('result-area');
 const resultPerfRef = document.getElementById('resultPerf');
 const resultPricePerfRef = document.getElementById('resultPricePerf');
 const viewMoreRef = document.getElementById('view-more');
 const searchCollapseButtonRef = document.getElementById('search-collapse-button');
 const searchCollapseRef = document.getElementById('search-collapse');
 const ajaxLoadingRef = document.getElementById('ajax-loading');
+const searchTipRef = document.getElementById('search-tip');
+const searchAreaRef = document.getElementById('search-area');
 
+// Resetting search values from URL
 priceRef.value = price;
 toleranceRef.value = tolerance || 10;
 discontinuedRef.checked = discontinued;
@@ -44,7 +48,6 @@ gpuBrandRef.value = gpuBrand || 'All';
 
 // Declare variable to store data
 let res;
-
 
 // Listening for events
 if (price != null && tolerance != null) {
@@ -57,6 +60,9 @@ if (price != null && tolerance != null) {
     }
 }
 
+window.addEventListener('resize', () => overlapCheck());
+
+// Listen for extra search options
 searchCollapseButtonRef.addEventListener('click', () => {
     const searchTipRef = document.getElementById('search-tip');
     if (searchCollapseRef.className === 'collapse') {
@@ -73,8 +79,42 @@ viewMoreRef.addEventListener('click', () => {
 });
 
 
+function overlapCheck() {
+    let rect1 = searchTipRef.getBoundingClientRect();
+    let rect2 = resultAreaRef.getBoundingClientRect();
+    let overlap = !(rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom);
+
+    if (overlap) {
+        // while (overlap) {
+        //     margin += 20;
+        //     // searchAreaRef.style.marginBottom = `${margin}px`;
+        //     // rect1 = searchTipRef.getBoundingClientRect();
+        //     // rect2 = resultAreaRef.getBoundingClientRect();
+        //     console.log(searchTipRef.getBoundingClientRect().bottom, resultAreaRef.getBoundingClientRect().top + margin);
+
+        //     overlap = !(rect1.right < rect2.left ||
+        //         rect1.left > rect2.right ||
+        //         rect1.bottom < rect2.top + margin ||
+        //         rect1.top > rect2.bottom);
+        // }
+        searchAreaRef.style.marginBottom = '150px';
+    } else {
+        overlap = !(rect1.right < rect2.left ||
+            rect1.left > rect2.right ||
+            rect1.bottom < rect2.top - 50 ||
+            rect1.top > rect2.bottom);
+        if (!overlap) {
+            searchAreaRef.style.marginBottom = '100px';
+        }
+    }
+}
+
 async function priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand) {
     document.getElementById('result-area').style.display = 'block';
+    overlapCheck();
     ajaxLoadingRef.style.display = 'inline-block';
     res = await getPrice({price, tolerance, discontinued, cpuBrand, gpuBrand});
     ajaxLoadingRef.style.display = 'none';

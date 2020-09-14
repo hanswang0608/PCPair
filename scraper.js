@@ -179,6 +179,7 @@ async function scrapeAllGPUs(browser) {
             onCC = true;
         } else {
             onCC = false;
+            await GPU.updateOne({name: gpu.name}, {online: false, instore: false});
         }
         await GPU.updateOne({name: gpu.name},
             {onCC, rank: index + 1, percentage: (gpu.score / baselineScore * 100).toFixed(2), maxPercentage: (gpu.score / highestScore * 100).toFixed(2)});
@@ -450,7 +451,7 @@ async function scrapeDiv(page, product) {
         // const productPrice = Math.round(sumVariantsPrice / variantsArr.length * 100) / 100;
         if (variantsArr.length === 0) return;
         variantsArr = variantsArr.sort((a, b) => b.price - a.price);
-        variantsArr.forEach(x => console.log(x.price));
+        // variantsArr.forEach(x => console.log(x.price));
         let productPrice;
         if (variantsArr.length % 2 === 0) {
             productPrice = (variantsArr[variantsArr.length / 2 - 1].price + variantsArr[variantsArr.length / 2].price) / 2;

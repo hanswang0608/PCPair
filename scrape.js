@@ -32,6 +32,7 @@ async function scrape() {
     process.exit();
 }
 
+
 // Functions for maintenance
 
 // Remove pairs with the specified gpu that has an incorrect pricehistory by price difference
@@ -48,10 +49,10 @@ async function remove() {
 }
 
 async function remove2() {
-    const x = await GPU.find();
+    const x = await Pair.find();
     for (gpu of x) {
         for (let i = 0; i < gpu.priceHistory.length; i++) {
-            if ((Date.now() - gpu.priceHistory[i].date) / 1000 / 60 / 60 < 80) {
+            if ((Date.now() - gpu.priceHistory[i].date) / 1000 / 60 / 60 < 50) {
                 gpu.priceHistory.splice(i, 1);
                 i -= 1;
             }
