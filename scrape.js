@@ -17,19 +17,19 @@ var scrp = schedule.scheduleJob('0 0 * * *', scrape);
 
 console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 
-// scrape();
+scrape();
 // Scrape function that updates to MongoDB Atlas
 async function scrape() {
-    console.log("Hey friends, active here...");
-    const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ["--hide-scrollbars"]
-    });
-    await scraper.scrapeCPU(browser);
-    await scraper.scrapeAllGPUs(browser);
-    await scraper.queryPairsNew();
-    await browser.close();
-    console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
-    process.exit();
+    // console.log("Hey friends, active here...");
+    // const browser = await puppeteer.launch({
+    //     ignoreDefaultArgs: ["--hide-scrollbars"]
+    // });
+    // await scraper.scrapeCPU(browser);
+    // await scraper.scrapeAllGPUs(browser);
+    // await scraper.queryPairsNew();
+    // await browser.close();
+    // console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
+    // process.exit();
 }
 
 
@@ -48,11 +48,14 @@ async function remove() {
     }
 }
 
+
+// Remove entries of priceHistory that is less than x hours old
 async function remove2() {
-    const x = await Pair.find();
-    for (gpu of x) {
+    const x = 50;
+    const arr = await Pair.find();
+    for (gpu of arr) {
         for (let i = 0; i < gpu.priceHistory.length; i++) {
-            if ((Date.now() - gpu.priceHistory[i].date) / 1000 / 60 / 60 < 50) {
+            if ((Date.now() - gpu.priceHistory[i].date) / 1000 / 60 / 60 < x) {
                 gpu.priceHistory.splice(i, 1);
                 i -= 1;
             }

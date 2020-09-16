@@ -18,7 +18,7 @@ import comparer from './sorting.js';
 // Read query values
 const searchParams = new URLSearchParams(window.location.search);
 const price = searchParams.get('price');
-const tolerance = searchParams.get('tolerance');
+const tolerance = Number.parseFloat(searchParams.get('tolerance'));
 const discontinued = searchParams.get('discontinued');
 const cpuBrand = searchParams.get('cpuBrand');
 const gpuBrand = searchParams.get('gpuBrand');
@@ -38,9 +38,11 @@ const searchCollapseRef = document.getElementById('search-collapse');
 const ajaxLoadingRef = document.getElementById('ajax-loading');
 const searchTipRef = document.getElementById('search-tip');
 const searchAreaRef = document.getElementById('search-area');
+const searchButtonGroupRef = document.getElementById('search-button-group');
+const searchButtonRef = document.getElementById('search-button');
 
 // Resetting search values from URL
-priceRef.value = price;
+// priceRef.value = price;
 toleranceRef.value = tolerance || 10;
 discontinuedRef.checked = discontinued;
 cpuBrandRef.value = cpuBrand || 'All';
@@ -51,12 +53,19 @@ let res;
 
 // Listening for events
 if (price != null && tolerance != null) {
-    if (price > 50 && tolerance > 0) {
-        priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand);
+    const priceMin = 50;
+    if (price >= 50) {
+        priceRef.value = price;
     } else {
-        const formWarningRef = document.getElementById('form-warning');
-        formWarningRef.innerHTML = 'bad input';
-        formWarningRef.style.display = 'block';
+        priceRef.placeholder = `Price must be at least ${priceMin}`;
+        priceRef.style.boxShadow = 'inset 0 0 3px rgb(255, 0, 32)';
+        priceRef.style.borderColor = 'rgb(255, 0, 32)';
+        // const formWarningRef = document.getElementById('form-warning');
+        // formWarningRef.innerHTML = 'bad input';
+        // formWarningRef.style.display = 'block';
+    }
+    if (price >= 50 && tolerance > 0) {
+        priceSearch(price, tolerance, discontinued, cpuBrand, gpuBrand);
     }
 }
 
