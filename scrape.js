@@ -17,19 +17,19 @@ var scrp = schedule.scheduleJob('0 0 * * *', scrape);
 
 console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 
-scrape();
+// scrape();
 // Scrape function that updates to MongoDB Atlas
 async function scrape() {
-    // console.log("Hey friends, active here...");
-    // const browser = await puppeteer.launch({
-    //     ignoreDefaultArgs: ["--hide-scrollbars"]
-    // });
-    // await scraper.scrapeCPU(browser);
-    // await scraper.scrapeAllGPUs(browser);
-    // await scraper.queryPairsNew();
-    // await browser.close();
-    // console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
-    // process.exit();
+    console.log("Hey friends, active here...");
+    const browser = await puppeteer.launch({
+        ignoreDefaultArgs: ["--hide-scrollbars"]
+    });
+    await scraper.scrapeCPU(browser);
+    await scraper.scrapeAllGPUs(browser);
+    await scraper.queryPairsNew();
+    await browser.close();
+    console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
+    process.exit();
 }
 
 

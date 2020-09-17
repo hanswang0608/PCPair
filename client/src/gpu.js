@@ -24,6 +24,12 @@ async function init() {
 
 init();
 
+window.addEventListener('resize', () => {
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(() => drawPriceChart(GPURes));
+    google.charts.setOnLoadCallback(() => drawScoreChart(GPURes));
+});
+
 async function getGPUInfo(gpuname) {
     GPURes = (await getGPU({name: gpuname})).data;
     console.log(GPURes);
@@ -75,8 +81,9 @@ function drawStackChart(res) {
 function drawScoreChart(res) {
     const scoreData = [['Date', 'Score']];
     res.scoreHistory.forEach(score => {
+        const currentDate = new Date(Date.now());
         const date = new Date(score.date);
-        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()}${date.getFullYear() === currentDate.getFullYear() ? '' : `/${date.getFullYear()}`}`;
         scoreData.push([`${dateStr}`, score.score]);
     });
 
@@ -110,8 +117,9 @@ function drawScoreChart(res) {
 function drawPriceChart(res) {
     const priceData = [['Date', 'Price']];
     res.priceHistory.forEach(price => {
+        const currentDate = new Date(Date.now());
         const date = new Date(price.date);
-        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()}${date.getFullYear() === currentDate.getFullYear() ? '' : `/${date.getFullYear()}`}`;
         priceData.push([`${dateStr}`, price.price]);
     });
 

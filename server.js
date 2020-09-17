@@ -57,13 +57,13 @@ async function scrape() {
         args: ["--no-sandbox"]
     });
     if (process.env.NODE_ENV === 'production') {
-        await scraper.scrapeCPU(browser);
+        // await scraper.scrapeCPU(browser);
         await scraper.scrapeAllGPUs(browser);
-        await scraper.queryPairsNew();
+        // await scraper.queryPairsNew();
     }
     // await scraper.scrapeCPU(browser);
     await scraper.scrapeAllGPUs(browser);
-    // await scraper.queryPairsNew();
+    await scraper.queryPairsNew();
 }
 
 
