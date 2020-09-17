@@ -212,9 +212,30 @@ async function scrapeGPU(browser, product) {
     const cc = await browser.newPage();
     // console.log('new page created.');
     await cc.setViewport({width: 1920, height: 1920, deviceScaleFactor: 1});
-    await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
+    try {
+        await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
+    } catch (e) {
+        await cc.waitFor(3000);
+        try {
+            await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
+        } catch (e) {
+            console.log(`Cannot navigate to CC for ${product.name} , skipping`);
+            return;
+        }
+    }
     // console.log('page navigated to canada computers.');
-    const gpuList = await cc.$$eval('#collapse3 > div > ul > li', lis => lis.map(li => li.textContent.match(/^[^\(]*/)[0].trim()));
+    let gpuList;
+    try {
+        gpuList = await cc.$$eval('#collapse3 > div > ul > li', lis => lis.map(li => li.textContent.match(/^[^\(]*/)[0].trim()));
+    } catch (e) {
+        await cc.waitFor(3000);
+        try {
+            gpuList = await cc.$$eval('#collapse3 > div > ul > li', lis => lis.map(li => li.textContent.match(/^[^\(]*/)[0].trim()));
+        } catch (e) {
+            console.log(`Cannot read gpuList for ${product.name} , skipping`);
+            return;
+        }
+    }
     let gpuMatch;
     for (let i = 0; i < gpuList.length; i++) {
         if (tempName === gpuList[i]) {
@@ -244,9 +265,17 @@ async function scrapeCPU(browser) {
     console.log('Scraping CPU');
     const cc = await browser.newPage();
     // console.log('new page created.');
-    await cc.goto('https://www.canadacomputers.com/index.php?cPath=4', {
-        timeout: 300000
-    });
+    try {
+        await cc.goto('https://www.canadacomputers.com/index.php?cPath=4');
+    } catch (e) {
+        await cc.waitFor(3000);
+        try {
+            await cc.goto('https://www.canadacomputers.com/index.php?cPath=4');
+        } catch (e) {
+            console.log(`Cannot navigate to CC for CPU, skipping`);
+            return;
+        }
+    }
     // console.log('page navigated to canada computers.');
     await loadFullPage(cc);
     // console.log('full page loaded.');
