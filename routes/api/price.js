@@ -2,7 +2,6 @@ const express = require('express');
 const scraper = require('../../scraper');
 
 const router = express.Router();
-const {isNull} = require('util');
 
 // Get an existing price query
 router.get('/', (req, res) => {

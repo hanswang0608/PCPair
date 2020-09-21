@@ -2,7 +2,6 @@ const express = require('express');
 const CPU = require('../../models/CPU');
 
 const router = express.Router();
-const {isNull} = require('util');
 
 // GET All CPUs
 // router.get('/', (req, res) => {
@@ -26,14 +25,14 @@ const {isNull} = require('util');
 // router.get('/:id', async (req, res) => {
 //     try {
 //         const data = await CPU.findById(req.params.id);
-//         if (isNull(data)) {
+//         if (data === null) {
 //             throw new Error();
 //         }
 //         res.json(data);
 //     } catch (e) {
 //         try {
 //             const data = await CPU.findOne({name: req.params.id});
-//             if (isNull(data)) throw new Error();
+//             if (data === null) throw new Error();
 //             res.json(data);
 //         } catch (e) {
 //             res.status(404).json({success: false, message: 'Item not found'});
@@ -45,7 +44,7 @@ router.get('/', (req, res) => {
     if (Object.keys(req.query).length !== 0) {
         CPU.findOne({name: req.query.name})
             .then(async data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 data._doc.total = await CPU.countDocuments();
                 res.json(data);
             })
@@ -53,7 +52,7 @@ router.get('/', (req, res) => {
     } else {
         CPU.find()
             .then(data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 res.json(data);
             })
             .catch(err => res.status(500).json({success: false, message: 'Get request failed'}));
@@ -93,7 +92,7 @@ router.put('/:id', async (req, res) => {
     }
     try {
         const data = await CPU.findById(req.params.id);
-        if (isNull(data)) {
+        if (data === null) {
             throw new Error();
         }
         try {
@@ -103,7 +102,7 @@ router.put('/:id', async (req, res) => {
     } catch (e) {
         try {
             const data = await CPU.findOne({name: req.params.id});
-            if (isNull(data)) {
+            if (data === null) {
                 throw new Error();
             }
             try {
@@ -135,7 +134,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const data = await CPU.findById(req.params.id);
-        if (isNull(data)) {
+        if (data === null) {
             throw new Error();
         }
         try {
@@ -145,7 +144,7 @@ router.delete('/:id', async (req, res) => {
     } catch (e) {
         try {
             const data = await CPU.findOne({name: req.params.id});
-            if (isNull(data)) {
+            if (data === null) {
                 throw new Error();
             }
             try {

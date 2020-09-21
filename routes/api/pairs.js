@@ -2,7 +2,6 @@ const express = require('express');
 const Pair = require('../../models/Pair');
 
 const router = express.Router();
-const {isNull} = require('util');
 
 // GET All Scoress
 // router.get('/', (req, res) => {
@@ -26,14 +25,14 @@ const {isNull} = require('util');
 // router.get('/:id', async (req, res) => {
 //     try {
 //         const data = await Pair.findById(req.params.id);
-//         if (isNull(data)) {
+//         if (data === null) {
 //             throw new Error();
 //         }
 //         res.json(data);
 //     } catch (e) {
 //         try {
 //             const data = await Pair.findOne({name: req.params.id});
-//             if (isNull(data)) throw new Error();
+//             if (data === null) throw new Error();
 //             res.json(data);
 //         } catch (e) {
 //             res.status(404).json({success: false, message: 'Item not found'});
@@ -45,7 +44,7 @@ router.get('/', (req, res) => {
     if (req.query.cpu && req.query.gpu) {
         Pair.findOne({cpu: req.query.cpu, gpu: req.query.gpu})
             .then(async data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 data._doc.total = (await Pair.find().sort({rank: -1}).limit(1))[0].rank;
                 res.json(data);
             })
@@ -53,19 +52,19 @@ router.get('/', (req, res) => {
     } else if (req.query.cpu) {
         Pair.find({cpu: req.query.cpu})
             .then(data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 res.json(data);
             });
     } else if (req.query.gpu) {
         Pair.find({gpu: req.query.gpu})
             .then(data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 res.json(data);
             });
     } else {
         Pair.find()
             .then(data => {
-                if (isNull(data)) return res.status(404).json({success: false, message: 'Item not found'});
+                if (data === null) return res.status(404).json({success: false, message: 'Item not found'});
                 res.json(data);
             })
             .catch(err => res.status(500).json({success: false, message: 'Get request failed'}));
@@ -105,7 +104,7 @@ router.put('/:id', async (req, res) => {
     }
     try {
         const data = await Pair.findById(req.params.id);
-        if (isNull(data)) {
+        if (data === null) {
             throw new Error();
         }
         try {
@@ -115,7 +114,7 @@ router.put('/:id', async (req, res) => {
     } catch (e) {
         try {
             const data = await Pair.findOne({name: req.params.id});
-            if (isNull(data)) {
+            if (data === null) {
                 throw new Error();
             }
             try {
@@ -147,7 +146,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const data = await Pair.findById(req.params.id);
-        if (isNull(data)) {
+        if (data === null) {
             throw new Error();
         }
         try {
@@ -157,7 +156,7 @@ router.delete('/:id', async (req, res) => {
     } catch (e) {
         try {
             const data = await Pair.findOne({name: req.params.id});
-            if (isNull(data)) {
+            if (data === null) {
                 throw new Error();
             }
             try {

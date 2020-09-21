@@ -89,20 +89,6 @@ async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand
     return results;
 }
 
-// function scoreThresholdFactor(priceTarget) {
-//     const startPrice = 700;
-//     const endPrice = 1900;
-//     const baselineFactor = 0.9;
-//     if (priceTarget <= startPrice) {
-//         return baselineFactor;
-//     } else if (priceTarget > startPrice && priceTarget <= endPrice) {
-//         const x = (priceTarget - startPrice) / 100;
-//         return 0.09 / 12 * x + 0.9;
-//     } else {
-//         return baselineFactor + 0.09;
-//     }
-// }
-
 
 // Function for scraping new CPU and GPU pairs
 async function queryPairsNew(priceTarget) {

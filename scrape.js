@@ -31,11 +31,8 @@ async function scrape() {
     console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
     process.exit();
 }
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 83172539a13911a45b74d4d9ca3252dc0ce1a634
 
 // Functions for maintenance
 
