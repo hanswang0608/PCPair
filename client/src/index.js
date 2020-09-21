@@ -97,18 +97,6 @@ function overlapCheck() {
         rect1.top > rect2.bottom);
 
     if (overlap) {
-        // while (overlap) {
-        //     margin += 20;
-        //     // searchAreaRef.style.marginBottom = `${margin}px`;
-        //     // rect1 = searchTipRef.getBoundingClientRect();
-        //     // rect2 = resultAreaRef.getBoundingClientRect();
-        //     console.log(searchTipRef.getBoundingClientRect().bottom, resultAreaRef.getBoundingClientRect().top + margin);
-
-        //     overlap = !(rect1.right < rect2.left ||
-        //         rect1.left > rect2.right ||
-        //         rect1.bottom < rect2.top + margin ||
-        //         rect1.top > rect2.bottom);
-        // }
         searchAreaRef.style.marginBottom = '150px';
     } else {
         overlap = !(rect1.right < rect2.left ||

@@ -5,21 +5,20 @@ const puppeteer = require('puppeteer');
 const scraper = require('./scraper');
 const mongoURI = require('./config/keys');
 
-// Import routes
+// Import Express routes
 const gpus = require('./routes/api/gpus');
 const cpus = require('./routes/api/cpus');
 const pairs = require('./routes/api/pairs');
 const price = require('./routes/api/price');
 const routes = require('./routes/routes');
 
+// Import Mongoose Models
 const CPU = require('./models/CPU');
 const GPU = require('./models/GPU');
 const Pair = require('./models/Pair');
 
-
 const app = express();
 
-// Body-Parser
 app.use(express.json());
 
 // CORS Policy
@@ -46,32 +45,3 @@ mongoose.connect(mongoURI,
 // Setting a Port
 const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Server started on port ${port}`));
-
-// scrape();
-
-// --- DISABLED --- 
-//Main scrape function that runs on heroku worker
-async function scrape() {
-    const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ["--hide-scrollbars"],
-        args: ["--no-sandbox"]
-    });
-    if (process.env.NODE_ENV === 'production') {
-        // await scraper.scrapeCPU(browser);
-        await scraper.scrapeAllGPUs(browser);
-        // await scraper.queryPairsNew();
-    }
-    // await scraper.scrapeCPU(browser);
-    await scraper.scrapeAllGPUs(browser);
-    await scraper.queryPairsNew();
-}
-
-
-// const nameCheck = 'RX vega 56'.replace(/GeForce/i, '').replace(/RTX/i, '').replace(/Radeon/i, '').replace(/RX/i, '').trim();
-// console.log(nameCheck);
-
-// const nameCheck = new RegExp('Radeon RX 5700XT'.replace('GeForce', '').replace('RTX', '').replace('Radeon', '').replace('RX', '').replace(/ /g, ''), 'i');
-// console.log(nameCheck);
-// console.log(Boolean('ASUS ROG STRIX Radeon RX 5700 XT Overclocked 8G GDDR6 HDMI DP'.replace(/ /g, '').match(nameCheck)));
-
-// console.log(549.00.toFixed(2));
