@@ -21,9 +21,22 @@ console.log("Hey friends, nothing happening here... Scraping starts at 00:00");
 // Scrape function that updates to MongoDB Atlas
 async function scrape() {
     console.log("Hey friends, active here...");
-    const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ["--hide-scrollbars"]
-    });
+    let browser;
+    try {
+        browser = await puppeteer.launch({
+            ignoreDefaultArgs: ["--hide-scrollbars"]
+        });
+    } catch (e) {
+        console.log('Opening browser failed once... Trying again');
+        try {
+            browser = await puppeteer.launch({
+                ignoreDefaultArgs: ["--hide-scrollbars"]
+            });
+        } catch (e) {
+            console.log('Opening browser failed twice, exiting program');
+            return;
+        }
+    }
     await scraper.scrapeCPU(browser);
     await scraper.scrapeAllGPUs(browser);
     await scraper.queryPairsNew();
