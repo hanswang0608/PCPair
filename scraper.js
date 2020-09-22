@@ -152,7 +152,7 @@ async function scrapeAllGPUs(browser) {
     const promises = [];
     const GPUs = await GPU.find();
     for (gpu of GPUs) {
-        promises.push(scrapeGPU(browser, gpu));
+        promises.push(await scrapeGPU(browser, gpu));
     }
     await Promise.all(promises);
     const GPUArr = await GPU.find();
