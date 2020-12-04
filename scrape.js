@@ -7,9 +7,10 @@ const scraper = require('./scraper');
 const CPU = require('./models/CPU');
 const GPU = require('./models/GPU');
 const Pair = require('./models/Pair');
+const scraperConfig = require('./config/scraper-config.json');
 
 mongoose.connect('mongodb+srv://hans:010608Wang@pcpair.9ty34.azure.mongodb.net/PCPair?retryWrites=true&w=majority',
-    {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+    { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
@@ -51,7 +52,7 @@ async function scrape() {
 
 // Remove pairs with the specified gpu that has an incorrect pricehistory by price difference
 async function remove() {
-    const x = await Pair.find({gpu: 'GeForce RTX 2070 Super'});
+    const x = await Pair.find({ gpu: 'GeForce RTX 2070 Super' });
     for (pair of x) {
         for (let i = 0; i < pair.priceHistory.length; i++) {
             if (pair.priceHistory[i].price > pair.priceHistory[pair.priceHistory.length - 1].price + 200) {

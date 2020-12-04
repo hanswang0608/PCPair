@@ -7,5 +7,10 @@
         "10700KA"
     ],
     "navigationTimeout": 300000,
-    "onCCThreshold": 600
+    "onCCThreshold": 600,
+    "GPUPairBlacklist": [
+        "Radeon RX 6800",
+        "Radeon RX 6800 XT"
+    ],
+    "CPUPairBlacklist": []
 }

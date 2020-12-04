@@ -15,9 +15,9 @@ async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand
     const results = [];
     let query = {};
     query['$and'] = [];
-    query['$and'].push({price: {$lte: priceTarget * (100 + tolerance) / 100}});
+    query['$and'].push({ price: { $lte: priceTarget * (100 + tolerance) / 100 } });
     if (!discontinued) {
-        query['$and'].push({onCC: true});
+        query['$and'].push({ onCC: true });
     }
     let queryRes = await Pair.find(query);
     let combinations = [];
@@ -38,10 +38,10 @@ async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand
     while (combinations.length === 0) {
         if (priceTarget <= 300) {
             tolerance += 25;
-            query['$and'][0] = {price: {$lte: priceTarget * (100 + tolerance) / 100}};
+            query['$and'][0] = { price: { $lte: priceTarget * (100 + tolerance) / 100 } };
         } else {
             tolerance += 10;
-            query['$and'][0] = {price: {$lte: priceTarget * (100 + tolerance) / 100}};
+            query['$and'][0] = { price: { $lte: priceTarget * (100 + tolerance) / 100 } };
         }
         queryRes = await Pair.find(query);
         if (cpuBrand !== 'All' || gpuBrand !== 'All') {
@@ -94,19 +94,22 @@ async function queryPairsExisting(priceTarget, tolerance, discontinued, cpuBrand
 async function queryPairsNew(priceTarget) {
     let CPUCollection = await CPU.find();
     let GPUCollection = await GPU.find();
+    GPUCollection = GPUCollection.filter(gpu => !scraperConfig.GPUPairBlacklist.includes(gpu.name));
+    CPUCollection = CPUCollection.filter(cpu => !scraperConfig.CPUPairBlacklist.includes(cpu.name));
     if (priceTarget) {
         GPUCollection = GPUCollection.filter(gpu => gpu.price <= priceTarget * 1.1);
         CPUCollection = CPUCollection.filter(cpu => cpu.price <= priceTarget * 1.1);
     }
+    GPUCollection.forEach(gpu => console.log(gpu.name));
     const pairs = [];
     for (cpu of CPUCollection) {
         for (gpu of GPUCollection) {
             if (priceTarget) {
                 if ((cpu.price + gpu.price > priceTarget * 0.9) && (cpu.price + gpu.price < priceTarget * 1.1)) {
-                    pairs.push(new Object({cpu, gpu}));
+                    pairs.push(new Object({ cpu, gpu }));
                 }
             } else {
-                pairs.push(new Object({cpu, gpu}));
+                pairs.push(new Object({ cpu, gpu }));
             }
         }
     }
@@ -131,15 +134,15 @@ async function queryPairsNew(priceTarget) {
         else return 1;
     });
     const highestScore = pairArr[0].score;
-    const baselineScore = (await Pair.findOne({cpu: scraperConfig.relativeCPU, gpu: scraperConfig.relativeGPU})).score;
+    const baselineScore = (await Pair.findOne({ cpu: scraperConfig.relativeCPU, gpu: scraperConfig.relativeGPU })).score;
     for ([index, pair] of pairArr.entries()) {
         if (pair.score === 0) {
             for (zeroScorePair of pairArr.slice(index)) {
-                await Pair.updateOne({gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu}, {rank: index + 1, percentage: 0, maxPercentage: 0});
+                await Pair.updateOne({ gpu: zeroScorePair.gpu, cpu: zeroScorePair.cpu }, { rank: index + 1, percentage: 0, maxPercentage: 0 });
             }
             break;
         }
-        await Pair.updateOne({gpu: pair.gpu, cpu: pair.cpu}, {rank: index + 1, percentage: (pair.score / baselineScore * 100).toFixed(2), maxPercentage: (pair.score / highestScore * 100).toFixed(2)});
+        await Pair.updateOne({ gpu: pair.gpu, cpu: pair.cpu }, { rank: index + 1, percentage: (pair.score / baselineScore * 100).toFixed(2), maxPercentage: (pair.score / highestScore * 100).toFixed(2) });
     }
 
     console.log('Done All');
@@ -161,17 +164,17 @@ async function scrapeAllGPUs(browser) {
         else return 1;
     });
     const highestScore = GPUArr[0].score;
-    const baselineScore = (await GPU.findOne({name: scraperConfig.relativeGPU})).score;
+    const baselineScore = (await GPU.findOne({ name: scraperConfig.relativeGPU })).score;
     for ([index, gpu] of GPUArr.entries()) {
         let onCC;
         if ((new Date() - gpu.lastModified) / 1000 < scraperConfig.onCCThreshold) {
             onCC = true;
         } else {
             onCC = false;
-            await GPU.updateOne({name: gpu.name}, {online: false, instore: false});
+            await GPU.updateOne({ name: gpu.name }, { online: false, instore: false });
         }
-        await GPU.updateOne({name: gpu.name},
-            {onCC, rank: index + 1, percentage: (gpu.score / baselineScore * 100).toFixed(2), maxPercentage: (gpu.score / highestScore * 100).toFixed(2)});
+        await GPU.updateOne({ name: gpu.name },
+            { onCC, rank: index + 1, percentage: (gpu.score / baselineScore * 100).toFixed(2), maxPercentage: (gpu.score / highestScore * 100).toFixed(2) });
     }
     console.log('All GPUs Finished Scraping');
 }
@@ -185,12 +188,12 @@ async function scrapeGPU(browser, product) {
         return;
     }
     const score = await scrapeGPUScore(product.name);
-    await GPU.updateOne({name: product.name}, {score});
+    await GPU.updateOne({ name: product.name }, { score });
     let scoreHistory = product.scoreHistory;
     if (scoreHistory.length === 0 || (score !== scoreHistory[scoreHistory.length - 1].score)) {
-        scoreHistory.push(new Object({score, date: Date.now()}));
+        scoreHistory.push(new Object({ score, date: Date.now() }));
     }
-    await GPU.updateOne({name: product.name}, {scoreHistory});
+    await GPU.updateOne({ name: product.name }, { scoreHistory });
 
     // List of special names
     let tempName = product.name;
@@ -201,7 +204,7 @@ async function scrapeGPU(browser, product) {
 
     // Scraping Canada Computers
     const cc = await browser.newPage();
-    await cc.setViewport({width: 1920, height: 1920, deviceScaleFactor: 1});
+    await cc.setViewport({ width: 1920, height: 1920, deviceScaleFactor: 1 });
     try {
         await cc.goto('https://www.canadacomputers.com/index.php?cPath=43');
     } catch (e) {
@@ -363,8 +366,8 @@ async function scrapeDiv(page, product) {
         }
         if (isCPU) {
             try {
-                newProduct.priceHistory = [...(await CPU.findOne({name: newProduct.name})).priceHistory];
-                newProduct.scoreHistory = [...(await CPU.findOne({name: newProduct.name})).scoreHistory];
+                newProduct.priceHistory = [...(await CPU.findOne({ name: newProduct.name })).priceHistory];
+                newProduct.scoreHistory = [...(await CPU.findOne({ name: newProduct.name })).scoreHistory];
             } catch (e) {
                 console.log(`${newProduct.name} is new`);
                 newProduct.priceHistory = [];
@@ -379,7 +382,7 @@ async function scrapeDiv(page, product) {
 
             newProduct.score = await scrapeCPUScore(newProduct.name);
             if (newProduct.scoreHistory.length === 0 || (newProduct.score !== newProduct.scoreHistory[newProduct.scoreHistory.length - 1].score)) {
-                newProduct.scoreHistory.push(new Object({score: newProduct.score, date: Date.now()}));
+                newProduct.scoreHistory.push(new Object({ score: newProduct.score, date: Date.now() }));
             }
             newProduct.priceToPerf = (newProduct.score / newProduct.price).toFixed(4);
         }
@@ -397,10 +400,10 @@ async function scrapeDiv(page, product) {
         }
 
         newProduct.TS = '';
-        try {newProduct.company = await div.$eval('div.pq-img-manu_logo_box img', img => img.alt);} catch (e) {newProduct.company = undefined;}
+        try { newProduct.company = await div.$eval('div.pq-img-manu_logo_box img', img => img.alt); } catch (e) { newProduct.company = undefined; }
         let onlineStatus, instoreStatus;
-        try {onlineStatus = await div.$eval('a.stock-popup.pointer div:nth-child(1) small', small => small.textContent.trim());} catch (e) {onlineStatus = undefined;}
-        try {instoreStatus = await div.$eval('a.stock-popup.pointer div:nth-child(2) small', small => small.textContent.trim());} catch (e) {instoreStatus = undefined;}
+        try { onlineStatus = await div.$eval('a.stock-popup.pointer div:nth-child(1) small', small => small.textContent.trim()); } catch (e) { onlineStatus = undefined; }
+        try { instoreStatus = await div.$eval('a.stock-popup.pointer div:nth-child(2) small', small => small.textContent.trim()); } catch (e) { instoreStatus = undefined; }
 
         if (onlineStatus === 'Online In Stock' || onlineStatus === 'Order Online and Pick Up In-Store' || onlineStatus === 'Online Special Order')
             newProduct.online = true;
@@ -412,10 +415,10 @@ async function scrapeDiv(page, product) {
 
         newProduct.lastModified = Date.now();
 
-        try {newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href);} catch (e) {newProduct.ccLink = 'https://www.canadacomputers.com/index.php';};
+        try { newProduct.ccLink = await div.$eval('div.row > div > a', a => a.href); } catch (e) { newProduct.ccLink = 'https://www.canadacomputers.com/index.php'; };
 
         if (isCPU) {
-            let doc = await CPU.findOne({name: newProduct.name});
+            let doc = await CPU.findOne({ name: newProduct.name });
             if (doc) {
                 doc.name = newProduct.name;
                 doc.price = newProduct.price;
@@ -464,8 +467,8 @@ async function scrapeDiv(page, product) {
                 date: Date.now()
             }));
         }
-        const score = (await GPU.findOne({name: product.name})).score;
-        await GPU.updateOne({name: product.name},
+        const score = (await GPU.findOne({ name: product.name })).score;
+        await GPU.updateOne({ name: product.name },
             {
                 price: productPrice, variants: variantsArr, priceHistory, priceToPerf: (score / productPrice).toFixed(4), lastModified: Date.now(),
                 ccLink: page.url(), online: variantsArr.some(variant => variant.online), instore: variantsArr.some(variant => variant.instore)
@@ -479,7 +482,7 @@ async function scrapeDiv(page, product) {
             else return 1;
         });
         const highestScore = CPUArr[0].score;
-        const baselineScore = (await CPU.findOne({name: scraperConfig.relativeCPU})).score;
+        const baselineScore = (await CPU.findOne({ name: scraperConfig.relativeCPU })).score;
         for ([index, cpu] of CPUArr.entries()) {
             let onCC;
             if ((new Date() - cpu.lastModified) / 1000 < scraperConfig.onCCThreshold) {
@@ -487,8 +490,8 @@ async function scrapeDiv(page, product) {
             } else {
                 onCC = false;
             }
-            await CPU.updateOne({name: cpu.name},
-                {onCC, rank: index + 1, percentage: (cpu.score / baselineScore * 100).toFixed(2), maxPercentage: (cpu.score / highestScore * 100).toFixed(2)});
+            await CPU.updateOne({ name: cpu.name },
+                { onCC, rank: index + 1, percentage: (cpu.score / baselineScore * 100).toFixed(2), maxPercentage: (cpu.score / highestScore * 100).toFixed(2) });
         }
     }
 }
@@ -535,18 +538,18 @@ async function scrapePairScore(gpu, cpu) {
     let median = Math.round(isNaN(res.median) ? 0 : res.median);
     let newPair;
     try {
-        newPair = await Pair.findOne({gpu: gpuName, cpu: cpuName});
+        newPair = await Pair.findOne({ gpu: gpuName, cpu: cpuName });
         newPair.gpu = gpuName;
         newPair.cpu = cpuName;
         newPair.gpuBrand = gpu.company;
         newPair.cpuBrand = cpu.company;
         newPair.score = median;
         if (newPair.scoreHistory.length === 0 || (newPair.score !== newPair.scoreHistory[newPair.scoreHistory.length - 1].score)) {
-            newPair.scoreHistory.push(new Object({score: median, date: Date.now()}));
+            newPair.scoreHistory.push(new Object({ score: median, date: Date.now() }));
         }
         newPair.price = (gpu.price + cpu.price).toFixed(2);
         if (newPair.priceHistory.length === 0 || (newPair.price !== newPair.priceHistory[newPair.priceHistory.length - 1].price)) {
-            newPair.priceHistory.push(new Object({price: newPair.price, date: Date.now()}));
+            newPair.priceHistory.push(new Object({ price: newPair.price, date: Date.now() }));
         }
         newPair.priceToPerf = (median / (gpu.price + cpu.price)).toFixed(4);
         newPair.lastModified = Date.now();
@@ -558,9 +561,9 @@ async function scrapePairScore(gpu, cpu) {
             gpuBrand: gpu.company,
             cpuBrand: cpu.company,
             score: median,
-            scoreHistory: [{score: median, date: Date.now()}],
+            scoreHistory: [{ score: median, date: Date.now() }],
             price: (gpu.price + cpu.price).toFixed(2),
-            priceHistory: [{price: (gpu.price + cpu.price).toFixed(2), date: Date.now()}],
+            priceHistory: [{ price: (gpu.price + cpu.price).toFixed(2), date: Date.now() }],
             priceToPerf: (median / (gpu.price + cpu.price)).toFixed(4),
             lastModified: Date.now(),
             onCC: (gpu.onCC && cpu.onCC) ? true : false
