@@ -633,7 +633,7 @@ async function loadFullPage(page) {
             count = await page.$$eval('#product-list > div.col-xl-3.col-lg-4.col-6.mt-0_5.px-0_5.toggleBox.mb-1', divs => divs.length);
             moreToLoad = await page.$eval('#load_more', div => div.className) === 'pb-3 text-center text-uppercase text-muted';
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 
