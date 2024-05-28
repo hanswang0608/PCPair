@@ -1,5 +1,5 @@
 # PCPair
-<h3>My hobby website for PC building.</h3>
+<h3>A computer parts aggregator and recommender.</h3>
 
 <img src="./graphics/pcpair.png" alt="PCPair" width="60%">
 
@@ -8,7 +8,8 @@
 PCPair is meant to be used as a reference. Take recommendations with a grain of salt and ALWAYS watch benchmarks on real performance.
 
 # What is PCPAIR?
-PCPair is a website aimed at helping aspiring PC builders to buy the best components for their system (specifically CPU & GPU).
+PCPair is a website aimed at helping aspiring PC builders select the best components for their system (specifically CPU & GPU).
+Scores are computed from real benchmarks and pricing history.
 
 # How to Use
 <ul>
